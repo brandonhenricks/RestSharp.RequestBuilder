@@ -6,7 +6,7 @@ using System.Linq;
 namespace RestSharp.RequestBuilder
 {
     /// <summary>
-    /// RestRequestBuilder is a helper class that utilizes Fluent Syntax in order to create
+    /// RestRequestBuilder is a helper class library that utilizes Fluent Syntax in order to create
     /// RestRequest objects.
     /// </summary>
     public class RequestBuilder : IRequestBuilder
