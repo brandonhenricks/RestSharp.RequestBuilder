@@ -13,11 +13,11 @@ namespace RestSharp.RequestBuilder
         #region Private Properties
 
         private readonly string _resource;
+        private readonly Dictionary<string, string> _headers;
+        private readonly Dictionary<string, string> _cookies;
+        private readonly List<Parameter> _parameters;
         private DataFormat _dataFormat;
         private Method _method;
-        private Dictionary<string, string> _headers;
-        private Dictionary<string, string> _cookies;
-        private List<Parameter> _parameters;
         private object _body;
         private int _timeOut;
 
@@ -225,7 +225,7 @@ namespace RestSharp.RequestBuilder
             // Iterate over duplicate items.
             foreach (var dup in duplicates)
             {
-                var param = parameters.FirstOrDefault(x => x.Name == dup.Name);
+                var param = Array.Find(parameters, x => x.Name == dup.Name);
 
                 if (param is null) continue;
 
