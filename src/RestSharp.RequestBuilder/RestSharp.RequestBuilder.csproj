@@ -12,6 +12,9 @@
     <RepositoryUrl>https://github.com/brandonhenricks/RestSharp.RequestBuilder/</RepositoryUrl>
     <PackageTags>csharp restsharp</PackageTags>
     <RepositoryType>Dependency</RepositoryType>
+    <FileVersion>1.0.0.1</FileVersion>
+    <AssemblyVersion>1.0.0.1</AssemblyVersion>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
