@@ -1,8 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RestSharp.RequestBuilder.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RestSharp.RequestBuilder.UnitTests
 {
@@ -72,7 +70,7 @@ namespace RestSharp.RequestBuilder.UnitTests
         }
 
         [TestMethod]
-        public void AddHeader_With_Dupe_Header_Dupe_Ignored()
+        public void AddHeader_With_Dupe_Header_Returns_Valid_Count_1()
         {
             var request = _builder
                 .SetFormat(DataFormat.Json)
@@ -82,6 +80,31 @@ namespace RestSharp.RequestBuilder.UnitTests
                 .Create();
 
             Assert.AreEqual(1, _builder.HeaderCount);
+        }
+
+        [TestMethod]
+        public void RemoveHeaders_Returns_Valid_Count_0()
+        {
+            var request = _builder
+                .SetFormat(DataFormat.Json)
+                .SetMethod(Method.GET)
+                .AddHeader("test-header", "asdfasdfasdfasdfasdfasdfasdfasdfas")
+                .RemoveHeaders()
+                .Create();
+
+            Assert.AreEqual(0, _builder.HeaderCount);
+        }
+
+        [TestMethod]
+        public void RemoveHeader_Null_Argument_Throws_Exception()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => _builder.RemoveHeader(null));
+        }
+
+        [TestMethod]
+        public void RemoveParameter_Null_Argument_Throws_Exception()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => _builder.RemoveParameter(null));
         }
 
     }

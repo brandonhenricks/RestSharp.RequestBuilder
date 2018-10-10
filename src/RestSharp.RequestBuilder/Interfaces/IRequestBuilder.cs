@@ -20,6 +20,16 @@ namespace RestSharp.RequestBuilder.Interfaces
 
         IRequestBuilder AddParameters(Parameter[] parameters);
 
+        IRequestBuilder RemoveHeaders();
+
+        IRequestBuilder RemoveHeader(string name);
+
+        IRequestBuilder RemoveCookies();
+
+        IRequestBuilder RemoveParameters();
+
+        IRequestBuilder RemoveParameter(Parameter parameter);
+
         IRequestBuilder SetFormat(DataFormat dataFormat);
 
         IRequestBuilder AddBody(object body);

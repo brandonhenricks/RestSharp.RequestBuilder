@@ -6,7 +6,8 @@ using System.Linq;
 namespace RestSharp.RequestBuilder
 {
     /// <summary>
-    /// RestRequest Builder Class
+    /// RestRequestBuilder is a helper class that utilizes Fluent Syntax in order to create
+    /// RestRequest objects.
     /// </summary>
     public class RequestBuilder : IRequestBuilder
     {
@@ -29,7 +30,7 @@ namespace RestSharp.RequestBuilder
 
         #endregion Public Properties
 
-        #region Public Constructor
+        #region Public Constructors
 
         /// <summary>
         /// RequestBuilder Constructor
@@ -51,7 +52,50 @@ namespace RestSharp.RequestBuilder
             _timeOut = 0;
         }
 
-        #endregion Public Constructor
+        /// <summary>
+        /// RequestBuilder Constructor with <see cref="Method"/> argument.
+        /// </summary>
+        /// <param name="resource"></param>
+        /// <param name="method"></param>
+        public RequestBuilder(string resource, Method method)
+        {
+            if (string.IsNullOrEmpty(resource))
+            {
+                throw new ArgumentNullException(nameof(resource));
+            }
+
+            _resource = resource;
+            _headers = new Dictionary<string, string>();
+            _parameters = new List<Parameter>();
+            _method = method;
+            _dataFormat = DataFormat.Json;
+            _cookies = new Dictionary<string, string>();
+            _timeOut = 0;
+        }
+
+        /// <summary>
+        /// RequestBuilder Constructor with <see cref="Method"/> and <see cref="DataFormat"/> arguments.
+        /// </summary>
+        /// <param name="resource"></param>
+        /// <param name="method"></param>
+        /// <param name="format"></param>
+        public RequestBuilder(string resource, Method method, DataFormat format)
+        {
+            if (string.IsNullOrEmpty(resource))
+            {
+                throw new ArgumentNullException(nameof(resource));
+            }
+
+            _resource = resource;
+            _headers = new Dictionary<string, string>();
+            _parameters = new List<Parameter>();
+            _method = method;
+            _dataFormat = format;
+            _cookies = new Dictionary<string, string>();
+            _timeOut = 0;
+        }
+
+        #endregion Public Constructors
 
         #region Public Methods
 
@@ -232,6 +276,80 @@ namespace RestSharp.RequestBuilder
                 _parameters.Remove(dup);
                 _parameters.Add(param);
             }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Removes a Header by name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public IRequestBuilder RemoveHeader(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            if (_headers.ContainsKey(name))
+            {
+                _headers.Remove(name);
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Removes All Headers.
+        /// </summary>
+        /// <returns></returns>
+        public IRequestBuilder RemoveHeaders()
+        {
+            _headers.Clear();
+            return this;
+        }
+
+        /// <summary>
+        /// Removes Cookies.
+        /// </summary>
+        /// <returns></returns>
+        public IRequestBuilder RemoveCookies()
+        {
+            _cookies.Clear();
+            return this;
+        }
+
+        /// <summary>
+        /// Removes Parameters.
+        /// </summary>
+        /// <returns></returns>
+        public IRequestBuilder RemoveParameters()
+        {
+            _parameters.Clear();
+            return this;
+        }
+
+        /// <summary>
+        /// Remove a Parameter.
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public IRequestBuilder RemoveParameter(Parameter parameter)
+        {
+            if (parameter is null)
+            {
+                throw new ArgumentNullException(nameof(parameter));
+            }
+
+            var param = _parameters.Find(p => p.Name == parameter.Name);
+
+            if (param is null)
+            {
+                return this;
+            }
+
+            _parameters.Remove(param);
 
             return this;
         }

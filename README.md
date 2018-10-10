@@ -21,13 +21,13 @@ Install-Package RestSharp.RequestBuilder
 ## Examples
 
 ```csharp
-	var builder = new RequestBuilder("user");
-	
-	var request = builder
-		.SetFormat(DataFormat.Json)
-		.SetMethod(Method.GET)
-		.AddHeader("test-header", "value")
-		.Create();
+var builder = new RequestBuilder("user");
+
+var request = builder
+	.SetFormat(DataFormat.Json)
+	.SetMethod(Method.GET)
+	.AddHeader("test-header", "value")
+	.Create();
 ```
 
 ## License
