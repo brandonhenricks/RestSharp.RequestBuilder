@@ -34,6 +34,8 @@ namespace RestSharp.RequestBuilder.Interfaces
 
         IRequestBuilder AddBody(object body);
 
+        IRequestBuilder AddFile(string name, string path, string contentType = null);
+
         IRestRequest Create();
     }
 }

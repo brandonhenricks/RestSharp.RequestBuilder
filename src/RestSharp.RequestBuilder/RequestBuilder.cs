@@ -22,6 +22,10 @@ namespace RestSharp.RequestBuilder
         private object _body;
         private int _timeOut;
 
+        private string _fileName;
+        private string _filePath;
+        private string _fileType;
+
         #endregion Private Properties
 
         #region Public Properties
@@ -112,6 +116,32 @@ namespace RestSharp.RequestBuilder
             }
 
             _body = body;
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a file to the RestRequest.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="path"></param>
+        /// <param name="contentType"></param>
+        /// <returns></returns>
+        public IRequestBuilder AddFile(string name, string path, string contentType = null)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            if (string.IsNullOrEmpty(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            _fileName = name;
+            _filePath = path;
+            _fileType = contentType;
+
             return this;
         }
 
@@ -380,6 +410,11 @@ namespace RestSharp.RequestBuilder
             foreach (var cookie in _cookies)
             {
                 request.AddCookie(cookie.Key, cookie.Value);
+            }
+
+            if (!string.IsNullOrEmpty(_fileName) && !string.IsNullOrEmpty(_filePath))
+            {
+                request.AddFile(_fileName, _filePath, _fileType);
             }
 
             request.Timeout = _timeOut;
