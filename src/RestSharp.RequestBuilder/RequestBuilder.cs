@@ -37,7 +37,7 @@ namespace RestSharp.RequestBuilder
         #region Public Constructors
 
         /// <summary>
-        /// RequestBuilder Constructor
+        /// Public Constructor with string as argument.
         /// </summary>
         /// <param name="resource"></param>
         public RequestBuilder(string resource)
@@ -48,6 +48,48 @@ namespace RestSharp.RequestBuilder
             }
 
             _resource = resource;
+            _headers = new Dictionary<string, string>();
+            _parameters = new List<Parameter>();
+            _method = Method.GET;
+            _dataFormat = DataFormat.Json;
+            _cookies = new Dictionary<string, string>();
+            _timeOut = 0;
+        }
+
+        /// <summary>
+        /// Public Constructor with a FormattableString argument. 
+        /// The string is stored as a string compiled with arguments.
+        /// </summary>
+        /// <param name="resource"></param>
+        public RequestBuilder(FormattableString resource)
+        {
+            if (resource is null)
+            {
+                throw new ArgumentNullException(nameof(resource));
+            }
+
+            _resource = resource.ToString();
+            _headers = new Dictionary<string, string>();
+            _parameters = new List<Parameter>();
+            _method = Method.GET;
+            _dataFormat = DataFormat.Json;
+            _cookies = new Dictionary<string, string>();
+            _timeOut = 0;
+        }
+
+        /// <summary>
+        /// Public Constructor with a Uri argument.
+        /// Uri argument is stored as string.
+        /// </summary>
+        /// <param name="resource"></param>
+        public RequestBuilder(Uri resource)
+        {
+            if (resource is null)
+            {
+                throw new ArgumentNullException(nameof(resource));
+            }
+
+            _resource = resource.ToString();
             _headers = new Dictionary<string, string>();
             _parameters = new List<Parameter>();
             _method = Method.GET;
