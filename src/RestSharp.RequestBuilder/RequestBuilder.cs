@@ -20,7 +20,7 @@ namespace RestSharp.RequestBuilder
         private DataFormat _dataFormat;
         private Method _method;
         private object _body;
-        private int _timeOut;
+        private TimeSpan? _timeOut;
 
         private string _fileName;
         private string _filePath;
@@ -50,31 +50,10 @@ namespace RestSharp.RequestBuilder
             _resource = resource;
             _headers = new Dictionary<string, string>();
             _parameters = new List<Parameter>();
-            _method = Method.GET;
+            _method = Method.Get;
             _dataFormat = DataFormat.Json;
             _cookies = new Dictionary<string, string>();
-            _timeOut = 0;
-        }
-
-        /// <summary>
-        /// Public Constructor with a FormattableString argument. 
-        /// The string is stored as a string compiled with arguments.
-        /// </summary>
-        /// <param name="resource"></param>
-        public RequestBuilder(FormattableString resource)
-        {
-            if (resource is null)
-            {
-                throw new ArgumentNullException(nameof(resource));
-            }
-
-            _resource = resource.ToString();
-            _headers = new Dictionary<string, string>();
-            _parameters = new List<Parameter>();
-            _method = Method.GET;
-            _dataFormat = DataFormat.Json;
-            _cookies = new Dictionary<string, string>();
-            _timeOut = 0;
+            _timeOut = TimeSpan.FromSeconds(30);
         }
 
         /// <summary>
@@ -92,10 +71,10 @@ namespace RestSharp.RequestBuilder
             _resource = resource.ToString();
             _headers = new Dictionary<string, string>();
             _parameters = new List<Parameter>();
-            _method = Method.GET;
+            _method = Method.Get;
             _dataFormat = DataFormat.Json;
             _cookies = new Dictionary<string, string>();
-            _timeOut = 0;
+            _timeOut = TimeSpan.FromSeconds(30);
         }
 
         /// <summary>
@@ -116,7 +95,7 @@ namespace RestSharp.RequestBuilder
             _method = method;
             _dataFormat = DataFormat.Json;
             _cookies = new Dictionary<string, string>();
-            _timeOut = 0;
+            _timeOut = TimeSpan.FromSeconds(30);
         }
 
         /// <summary>
@@ -138,7 +117,7 @@ namespace RestSharp.RequestBuilder
             _method = method;
             _dataFormat = format;
             _cookies = new Dictionary<string, string>();
-            _timeOut = 0;
+            _timeOut = TimeSpan.FromSeconds(30);
         }
 
         #endregion Public Constructors
@@ -289,14 +268,15 @@ namespace RestSharp.RequestBuilder
         /// </summary>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public IRequestBuilder SetTimeout(int timeout)
+        public IRequestBuilder SetTimeout(TimeSpan timeout)
         {
-            if (timeout < 0)
+            if (timeout == null)
             {
                 throw new ArgumentOutOfRangeException(nameof(timeout));
             }
 
             _timeOut = timeout;
+
             return this;
         }
 
@@ -430,9 +410,9 @@ namespace RestSharp.RequestBuilder
         /// Creates the IRestRequest object.
         /// </summary>
         /// <returns>IRestRequest</returns>
-        public IRestRequest Create()
+        public RestRequest Create()
         {
-            var request = new RestRequest(_resource, _method, _dataFormat);
+            var request = new RestRequest(_resource, _method);
 
             foreach (var param in _parameters)
             {
@@ -444,6 +424,8 @@ namespace RestSharp.RequestBuilder
                 request.AddBody(_body);
             }
 
+            request.RequestFormat = _dataFormat;
+
             foreach (var header in _headers)
             {
                 request.AddHeader(header.Key, header.Value);
@@ -451,7 +433,7 @@ namespace RestSharp.RequestBuilder
 
             foreach (var cookie in _cookies)
             {
-                request.AddCookie(cookie.Key, cookie.Value);
+                request.AddCookie(cookie.Key, cookie.Value, "/", _resource);
             }
 
             if (!string.IsNullOrEmpty(_fileName) && !string.IsNullOrEmpty(_filePath))
@@ -459,7 +441,10 @@ namespace RestSharp.RequestBuilder
                 request.AddFile(_fileName, _filePath, _fileType);
             }
 
-            request.Timeout = _timeOut;
+            if (_timeOut != null)
+            {
+                request.Timeout = _timeOut;
+            }
 
             return request;
         }

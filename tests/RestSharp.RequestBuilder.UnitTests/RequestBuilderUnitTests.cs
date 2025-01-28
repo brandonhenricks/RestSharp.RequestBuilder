@@ -24,13 +24,13 @@ namespace RestSharp.RequestBuilder.UnitTests
         [TestMethod]
         public void Constructor_Null_Resource_Throws_Exception()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => new RequestBuilder(null));
+            Assert.ThrowsException<ArgumentNullException>(static () => new RequestBuilder((string)null));
         }
 
         [TestMethod]
         public void Constructor_With_Resource_Is_Added()
         {
-            var request = _builder.SetMethod(Method.GET).Create();
+            var request = _builder.SetMethod(Method.Get).Create();
 
             Assert.AreEqual("test", request.Resource);
         }
@@ -44,9 +44,9 @@ namespace RestSharp.RequestBuilder.UnitTests
         [TestMethod]
         public void SetMethod_With_Value_Is_Correct()
         {
-            var request = _builder.SetMethod(Method.GET).Create();
+            var request = _builder.SetMethod(Method.Get).Create();
 
-            Assert.AreEqual(Method.GET, request.Method);
+            Assert.AreEqual(Method.Get, request.Method);
         }
 
         [TestMethod]
@@ -62,7 +62,7 @@ namespace RestSharp.RequestBuilder.UnitTests
         {
             var request = _builder
                 .SetFormat(DataFormat.Json)
-                .SetMethod(Method.GET)
+                .SetMethod(Method.Get)
                 .AddHeader("test-header", "asdfasdfasdfasdfasdfasdfasdfasdfas")
                 .Create();
 
@@ -74,7 +74,7 @@ namespace RestSharp.RequestBuilder.UnitTests
         {
             var request = _builder
                 .SetFormat(DataFormat.Json)
-                .SetMethod(Method.GET)
+                .SetMethod(Method.Get)
                 .AddHeader("test-header", "asdfasdfasdfasdfasdfasdfasdfasdfas")
                 .AddHeader("test-header", "asdfasdfasdfasdfasdfasdfasdfasdfas")
                 .Create();
@@ -87,7 +87,7 @@ namespace RestSharp.RequestBuilder.UnitTests
         {
             var request = _builder
                 .SetFormat(DataFormat.Json)
-                .SetMethod(Method.GET)
+                .SetMethod(Method.Get)
                 .AddHeader("test-header", "asdfasdfasdfasdfasdfasdfasdfasdfas")
                 .RemoveHeaders()
                 .Create();

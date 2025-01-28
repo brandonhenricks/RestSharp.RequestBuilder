@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace RestSharp.RequestBuilder.Interfaces
 {
@@ -12,7 +13,7 @@ namespace RestSharp.RequestBuilder.Interfaces
 
         IRequestBuilder AddHeaders(Dictionary<string, string> headers);
 
-        IRequestBuilder SetTimeout(int timeout);
+        IRequestBuilder SetTimeout(TimeSpan timeout);
 
         IRequestBuilder SetMethod(Method method);
 
@@ -36,6 +37,6 @@ namespace RestSharp.RequestBuilder.Interfaces
 
         IRequestBuilder AddFile(string name, string path, string contentType = null);
 
-        IRestRequest Create();
+        RestRequest Create();
     }
 }
