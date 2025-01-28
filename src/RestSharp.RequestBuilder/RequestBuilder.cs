@@ -307,8 +307,6 @@ namespace RestSharp.RequestBuilder
         /// <returns></returns>
         public IRequestBuilder AddParameters(Parameter[] parameters)
         {
-            // TODO: Revisit, this doesn't seem like the best approach.
-
             var duplicates = _parameters.Select(x => x).Intersect(parameters);
 
             // Check for duplicates.
