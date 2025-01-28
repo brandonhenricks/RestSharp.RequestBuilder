@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -16,17 +15,15 @@
     <AssemblyVersion>1.0.0.2</AssemblyVersion>
     <Version>1.0.2</Version>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="CSharpAnalyzers" Version="1.5.0">
+    <PackageReference Include="CSharpAnalyzers">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="RestSharp" Version="112.1.0" />
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.5.0.109200">
+    <PackageReference Include="RestSharp" />
+    <PackageReference Include="SonarAnalyzer.CSharp">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
 </Project>
