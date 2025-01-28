@@ -24,7 +24,7 @@ jobs:
         working-directory: src
 
       - name: Run dotnet format
-        run: dotnet format src/RestSharp.RequestBuilder.sln --exclude ./examples/** --verify-no-changes --verbosity diagnostic
+        run: dotnet format RestSharp.RequestBuilder.sln --exclude ./examples/** --verify-no-changes --verbosity diagnostic
         working-directory: src
 
   build_and_test:
