@@ -8,6 +8,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Product>RestSharp.RequestBuilder</Product>
     <Title>$(Product)</Title>
+    <Description>RestSharp.RequestBuilder is a wrapper class that uses Fluent Syntax to create RestRequest objects.</Description>
     <PackageProjectUrl>https://github.com/brandonhenricks/RestSharp.RequestBuilder/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/brandonhenricks/RestSharp.RequestBuilder/</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
