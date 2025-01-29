@@ -4,7 +4,7 @@ namespace RestSharp.RequestBuilder.Models
 {
     internal sealed class CookieValue : IEquatable<CookieValue>
     {
-        public string Name { get;}
+        public string Name { get; }
 
         public string Value { get; }
 
