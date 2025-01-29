@@ -20,31 +20,6 @@ namespace RestSharp.RequestBuilder.Models
             Domain = domain;
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj is CookieValue)
-            {
-                return Equals((CookieValue)obj);
-            }
-
-            return base.Equals(obj);
-        }
-
-        public static bool operator ==(CookieValue first, CookieValue second)
-        {
-            if ((object)first == null)
-            {
-                return (object)second == null;
-            }
-
-            return first.Equals(second);
-        }
-
-        public static bool operator !=(CookieValue first, CookieValue second)
-        {
-            return !(first == second);
-        }
-
         public bool Equals(CookieValue other)
         {
             if (ReferenceEquals(null, other))
@@ -78,6 +53,31 @@ namespace RestSharp.RequestBuilder.Models
             }
 
             return true;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is CookieValue cookieValue)
+            {
+                return Equals(cookieValue);
+            }
+            
+            return false;
+        }
+
+        public static bool operator ==(CookieValue first, CookieValue second)
+        {
+            if ((object)first == null)
+            {
+                return (object)second == null;
+            }
+
+            return first.Equals(second);
+        }
+
+        public static bool operator !=(CookieValue first, CookieValue second)
+        {
+            return !(first == second);
         }
 
         public override int GetHashCode()

@@ -140,9 +140,9 @@ namespace RestSharp.RequestBuilder
         }
 
         /// <inheritdoc/>
-        public IRequestBuilder AddBody<T>(T body, DataFormat dataFormat)
+        public IRequestBuilder AddBody<T>(T body, DataFormat dataFormat) where T: class
         {
-            if (body == null)
+            if (body is null)
             {
                 throw new ArgumentNullException(nameof(body));
             }

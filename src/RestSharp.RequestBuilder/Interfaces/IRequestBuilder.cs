@@ -39,18 +39,29 @@ namespace RestSharp.RequestBuilder.Interfaces
         IRequestBuilder AddHeaders(IDictionary<string, string> headers);
 
         /// <summary>
-        /// Sets the timeout for the request.
+        /// Adds a body to the request.
         /// </summary>
-        /// <param name="timeout">The timeout duration.</param>
+        /// <param name="body">The body to add.</param>
         /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
-        IRequestBuilder SetTimeout(TimeSpan timeout);
+        IRequestBuilder AddBody(object body);
 
         /// <summary>
-        /// Sets the HTTP method for the request.
+        /// Adds a body to the request with a specified data format.
         /// </summary>
-        /// <param name="method">The HTTP method to set.</param>
+        /// <typeparam name="T">The type of the body.</typeparam>
+        /// <param name="body">The body to add.</param>
+        /// <param name="dataFormat">The data format of the body.</param>
         /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
-        IRequestBuilder SetMethod(Method method);
+        IRequestBuilder AddBody<T>(T body, DataFormat dataFormat) where T: class;
+
+        /// <summary>
+        /// Adds a file to the request.
+        /// </summary>
+        /// <param name="name">The name of the file parameter.</param>
+        /// <param name="path">The path to the file.</param>
+        /// <param name="contentType">The content type of the file. Optional.</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder AddFile(string name, string path, string contentType = null);
 
         /// <summary>
         /// Adds a parameter to the request.
@@ -106,29 +117,18 @@ namespace RestSharp.RequestBuilder.Interfaces
         IRequestBuilder SetFormat(DataFormat dataFormat);
 
         /// <summary>
-        /// Adds a body to the request.
+        /// Sets the timeout for the request.
         /// </summary>
-        /// <param name="body">The body to add.</param>
+        /// <param name="timeout">The timeout duration.</param>
         /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
-        IRequestBuilder AddBody(object body);
+        IRequestBuilder SetTimeout(TimeSpan timeout);
 
         /// <summary>
-        /// Adds a body to the request with a specified data format.
+        /// Sets the HTTP method for the request.
         /// </summary>
-        /// <typeparam name="T">The type of the body.</typeparam>
-        /// <param name="body">The body to add.</param>
-        /// <param name="dataFormat">The data format of the body.</param>
+        /// <param name="method">The HTTP method to set.</param>
         /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
-        IRequestBuilder AddBody<T>(T body, DataFormat dataFormat);
-
-        /// <summary>
-        /// Adds a file to the request.
-        /// </summary>
-        /// <param name="name">The name of the file parameter.</param>
-        /// <param name="path">The path to the file.</param>
-        /// <param name="contentType">The content type of the file. Optional.</param>
-        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
-        IRequestBuilder AddFile(string name, string path, string contentType = null);
+        IRequestBuilder SetMethod(Method method);
 
         /// <summary>
         /// Creates the <see cref="RestRequest"/> based on the configured parameters.

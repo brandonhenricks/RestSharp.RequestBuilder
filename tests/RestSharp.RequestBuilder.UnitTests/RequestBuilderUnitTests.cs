@@ -54,7 +54,7 @@ namespace RestSharp.RequestBuilder.UnitTests
         [TestMethod]
         public void AddHeader_With_Dupe_Header_Returns_Valid_Count_1()
         {
-            var request = _builder
+             _builder
                 .SetFormat(DataFormat.Json)
                 .SetMethod(Method.Get)
                 .AddHeader("test-header", "header-value")
@@ -67,7 +67,7 @@ namespace RestSharp.RequestBuilder.UnitTests
         [TestMethod]
         public void RemoveHeaders_Returns_Valid_Count_0()
         {
-            var request = _builder
+            _builder
                 .SetFormat(DataFormat.Json)
                 .SetMethod(Method.Get)
                 .AddHeader("test-header", "header-value")
