@@ -52,7 +52,7 @@ namespace RestSharp.RequestBuilder.Interfaces
         /// <param name="body">The body to add.</param>
         /// <param name="dataFormat">The data format of the body.</param>
         /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
-        IRequestBuilder AddBody<T>(T body, DataFormat dataFormat) where T: class;
+        IRequestBuilder AddBody<T>(T body, DataFormat dataFormat) where T : class;
 
         /// <summary>
         /// Adds a file to the request.

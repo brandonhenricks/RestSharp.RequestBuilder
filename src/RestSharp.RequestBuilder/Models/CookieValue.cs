@@ -61,7 +61,7 @@ namespace RestSharp.RequestBuilder.Models
             {
                 return Equals(cookieValue);
             }
-            
+
             return false;
         }
 
