@@ -54,7 +54,7 @@ namespace RestSharp.RequestBuilder
             _parameters = new List<Parameter>();
             _method = Method.Get;
             _dataFormat = DataFormat.Json;
-            _cookieValues =  new HashSet<CookieValue>(new CookieValueComparer());
+            _cookieValues = new HashSet<CookieValue>(new CookieValueComparer());
             _timeOut = TimeSpan.FromSeconds(30);
         }
 
@@ -126,7 +126,6 @@ namespace RestSharp.RequestBuilder
 
         #region Public Methods
 
-
         /// <inheritdoc/>
         public IRequestBuilder AddBody(object body)
         {
@@ -140,7 +139,7 @@ namespace RestSharp.RequestBuilder
         }
 
         /// <inheritdoc/>
-        public IRequestBuilder AddBody<T>(T body, DataFormat dataFormat) where T: class
+        public IRequestBuilder AddBody<T>(T body, DataFormat dataFormat) where T : class
         {
             if (body is null)
             {
@@ -180,7 +179,6 @@ namespace RestSharp.RequestBuilder
             _dataFormat = dataFormat;
             return this;
         }
-
 
         /// <inheritdoc/>
         public IRequestBuilder AddHeader(string name, string value)
@@ -254,7 +252,6 @@ namespace RestSharp.RequestBuilder
             return this;
         }
 
-
         /// <inheritdoc/>
         public IRequestBuilder AddParameter(Parameter parameter)
         {
@@ -270,7 +267,6 @@ namespace RestSharp.RequestBuilder
 
             return this;
         }
-
 
         /// <inheritdoc/>
         public IRequestBuilder AddParameters(Parameter[] parameters)
@@ -298,7 +294,6 @@ namespace RestSharp.RequestBuilder
             return this;
         }
 
-
         /// <inheritdoc/>
         public IRequestBuilder RemoveHeader(string name)
         {
@@ -315,14 +310,12 @@ namespace RestSharp.RequestBuilder
             return this;
         }
 
-
         /// <inheritdoc/>
         public IRequestBuilder RemoveHeaders()
         {
             _headers.Clear();
             return this;
         }
-
 
         /// <inheritdoc/>
         public IRequestBuilder RemoveCookies()
@@ -331,14 +324,12 @@ namespace RestSharp.RequestBuilder
             return this;
         }
 
-
         /// <inheritdoc/>
         public IRequestBuilder RemoveParameters()
         {
             _parameters.Clear();
             return this;
         }
-
 
         /// <inheritdoc/>
         public IRequestBuilder RemoveParameter(Parameter parameter)
@@ -347,8 +338,8 @@ namespace RestSharp.RequestBuilder
             {
                 throw new ArgumentNullException(nameof(parameter));
             }
-            
-            var param = _parameters.Find(p => string.Equals(p.Name,  parameter.Name, StringComparison.InvariantCultureIgnoreCase));
+
+            var param = _parameters.Find(p => string.Equals(p.Name, parameter.Name, StringComparison.InvariantCultureIgnoreCase));
 
             if (param is null)
             {
@@ -359,7 +350,6 @@ namespace RestSharp.RequestBuilder
 
             return this;
         }
-
 
         /// <inheritdoc/>
         public RestRequest Create()

@@ -1,8 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RestSharp;
-using RestSharp.RequestBuilder.Interfaces;
-using System;
+﻿using System;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RestSharp.RequestBuilder.Interfaces;
 
 namespace RestSharp.RequestBuilder.UnitTests
 {
@@ -54,12 +53,12 @@ namespace RestSharp.RequestBuilder.UnitTests
         [TestMethod]
         public void AddHeader_With_Dupe_Header_Returns_Valid_Count_1()
         {
-             _builder
-                .SetFormat(DataFormat.Json)
-                .SetMethod(Method.Get)
-                .AddHeader("test-header", "header-value")
-                .AddHeader("test-header", "header-value")
-                .Create();
+            _builder
+               .SetFormat(DataFormat.Json)
+               .SetMethod(Method.Get)
+               .AddHeader("test-header", "header-value")
+               .AddHeader("test-header", "header-value")
+               .Create();
 
             Assert.AreEqual(1, _builder.HeaderCount);
         }
