@@ -4,16 +4,11 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Brandon Henricks</Authors>
     <Company>Brandon Henricks</Company>
-    <Description>RestSharp.RequestBuilder is a wrapper class that uses Fluent Syntax to create IRestRequest objects.</Description>
-    <Copyright>2018</Copyright>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/brandonhenricks/RestSharp.RequestBuilder/master/LICENSE</PackageLicenseUrl>
+    <Description>RestSharp.RequestBuilder is a wrapper class that uses Fluent Syntax to create RestRequest objects.</Description>
+    <Copyright>2025</Copyright>
     <PackageProjectUrl>https://github.com/brandonhenricks/RestSharp.RequestBuilder/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/brandonhenricks/RestSharp.RequestBuilder/</RepositoryUrl>
     <PackageTags>csharp restsharp</PackageTags>
-    <RepositoryType>Dependency</RepositoryType>
-    <FileVersion>1.0.0.2</FileVersion>
-    <AssemblyVersion>1.0.0.2</AssemblyVersion>
-    <Version>1.0.2</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CSharpAnalyzers">

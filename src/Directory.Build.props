@@ -1,0 +1,48 @@
+<Project>
+
+  <PropertyGroup>
+    <Company>Brandon Henricks</Company>
+    <Authors>$(Company)</Authors>
+    <Copyright>Copyright © $(Company) $([System.DateTime]::Now.Year)</Copyright>
+    <Trademark>$(Company)™</Trademark>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Product>RestSharp.RequestBuilder</Product>
+    <Title>$(Product)</Title>
+    <PackageProjectUrl>https://github.com/brandonhenricks/RestSharp.RequestBuilder/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/brandonhenricks/RestSharp.RequestBuilder/</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)\images\logo.png" Pack="true" Visible="false" PackagePath="" />
+    <None Include="$(MSBuildThisFileDirectory)\README.md" Pack="true" PackagePath=""/>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <CopyDocumentationFilesFromPackages>true</CopyDocumentationFilesFromPackages>
+    <CopyDebugSymbolFilesFromPackages>true</CopyDebugSymbolFilesFromPackages>
+    <NoWarn>$(NoWarn);NU1504;NU1505;NU1506;NU1701;1591</NoWarn>
+    <RootNamespace>RestSharp.RequestBuilder</RootNamespace>
+
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <TimestampServerUrl>http://timestamp.digicert.com</TimestampServerUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" $(Configuration) == 'Release' ">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup Label="StaticCodeAnalysis">
+    <PackageReference Include="SonarAnalyzer.CSharp">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

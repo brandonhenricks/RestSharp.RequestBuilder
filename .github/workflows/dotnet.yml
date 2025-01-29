@@ -68,4 +68,4 @@ jobs:
             --configuration Release `
             --no-build `
             --no-restore
-        working-directory: tests\RestSharp.RequestBuilder.UnitTests
+        working-directory: tests/RestSharp.RequestBuilder.UnitTests
