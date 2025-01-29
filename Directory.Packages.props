@@ -9,7 +9,7 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageVersion Include="MSTest.TestAdapter" Version="3.7.3" />
     <PackageVersion Include="MSTest.TestFramework" Version="3.7.3" />
-    <PackageVersion Include="RestSharp" Version="112.1.0" />
+    <PackageVersion Include="RestSharp" Version="[112.0.0,)" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.5.0.109200" />
   </ItemGroup>
 </Project>
