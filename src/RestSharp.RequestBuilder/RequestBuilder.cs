@@ -301,7 +301,7 @@ namespace RestSharp.RequestBuilder
         }
 
         /// <summary>
-        /// Add Parameters to the <see cref="IRestRequest"/> IRestRequest.
+        /// Add Parameters to the <see cref="RestRequest"/> IRestRequest.
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>

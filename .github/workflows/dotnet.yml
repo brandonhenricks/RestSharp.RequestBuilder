@@ -21,11 +21,9 @@ jobs:
 
       - name: Install dependencies
         run: dotnet restore
-        working-directory: src
 
       - name: Run dotnet format
         run: dotnet format RestSharp.RequestBuilder.sln --exclude ./examples/** --verify-no-changes --verbosity diagnostic
-        working-directory: src
 
   build_and_test:
     name: Build and Test
@@ -53,14 +51,12 @@ jobs:
         run: |
           dotnet restore `
             --locked-mode
-        working-directory: src
 
       - name: Build Solution
         run: |
           dotnet build `
             --configuration Release `
             --no-restore
-        working-directory: src
 
       - name: Test Solution
         run: |

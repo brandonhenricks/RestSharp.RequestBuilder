@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2041
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestSharp.RequestBuilder", "RestSharp.RequestBuilder\RestSharp.RequestBuilder.csproj", "{3467F99B-4205-4E1F-8D30-BF55948CB1F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestSharp.RequestBuilder", "src\RestSharp.RequestBuilder\RestSharp.RequestBuilder.csproj", "{3467F99B-4205-4E1F-8D30-BF55948CB1F9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit Tests", "Unit Tests", "{082B954B-1CB4-4CD8-B361-C087CE3622BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestSharp.RequestBuilder.UnitTests", "..\tests\RestSharp.RequestBuilder.UnitTests\RestSharp.RequestBuilder.UnitTests.csproj", "{254C141C-30DE-4C8A-BBE6-7D9973382F1F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestSharp.RequestBuilder.UnitTests", "tests\RestSharp.RequestBuilder.UnitTests\RestSharp.RequestBuilder.UnitTests.csproj", "{254C141C-30DE-4C8A-BBE6-7D9973382F1F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
