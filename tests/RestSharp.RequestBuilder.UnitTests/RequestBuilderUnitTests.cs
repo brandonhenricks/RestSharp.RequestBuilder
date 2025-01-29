@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RestSharp;
 using RestSharp.RequestBuilder.Interfaces;
 using System;
 

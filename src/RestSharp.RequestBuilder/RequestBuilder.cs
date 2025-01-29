@@ -140,6 +140,21 @@ namespace RestSharp.RequestBuilder
             return this;
         }
 
+        public IRequestBuilder AddBody<T>(T body, DataFormat dataFormat)
+        {
+            if (body == null)
+            {
+                throw new ArgumentNullException(nameof(body));
+            }
+
+            _body = body;
+
+            _dataFormat = dataFormat;
+
+            return this;
+        }
+
+
         /// <summary>
         /// Adds a file to the RestRequest.
         /// </summary>
@@ -230,7 +245,7 @@ namespace RestSharp.RequestBuilder
         /// </summary>
         /// <param name="headers"></param>
         /// <returns></returns>
-        public IRequestBuilder AddHeaders(Dictionary<string, string> headers)
+        public IRequestBuilder AddHeaders(IDictionary<string, string> headers)
         {
             foreach (var header in headers)
             {
