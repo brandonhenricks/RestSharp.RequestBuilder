@@ -18,8 +18,10 @@ namespace RestSharp.RequestBuilder.Interfaces
         /// </summary>
         /// <param name="name">The name of the cookie.</param>
         /// <param name="value">The value of the cookie.</param>
+        /// <param name="path"></param>
+        /// <param name="domain"></param>
         /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
-        IRequestBuilder AddCookie(string name, string value);
+        IRequestBuilder AddCookie(string name, string value, string path, string domain);
 
         /// <summary>
         /// Adds a header to the request.

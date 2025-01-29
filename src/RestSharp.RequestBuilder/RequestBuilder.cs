@@ -1,4 +1,5 @@
 ﻿using RestSharp.RequestBuilder.Interfaces;
+using RestSharp.RequestBuilder.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,13 +10,13 @@ namespace RestSharp.RequestBuilder
     /// RestRequestBuilder is a helper class library that utilizes Fluent Syntax in order to create
     /// RestRequest objects.
     /// </summary>
-    public class RequestBuilder : IRequestBuilder
+    public sealed class RequestBuilder : IRequestBuilder
     {
         #region Private Properties
 
         private readonly string _resource;
         private readonly Dictionary<string, string> _headers;
-        private readonly Dictionary<string, string> _cookies;
+        private readonly HashSet<CookieValue> _cookieValues;
         private readonly List<Parameter> _parameters;
         private DataFormat _dataFormat;
         private Method _method;
@@ -30,6 +31,7 @@ namespace RestSharp.RequestBuilder
 
         #region Public Properties
 
+        /// <inheritdoc/>
         public int HeaderCount => _headers.Count;
 
         #endregion Public Properties
@@ -52,7 +54,7 @@ namespace RestSharp.RequestBuilder
             _parameters = new List<Parameter>();
             _method = Method.Get;
             _dataFormat = DataFormat.Json;
-            _cookies = new Dictionary<string, string>();
+            _cookieValues =  new HashSet<CookieValue>(new CookieValueComparer());
             _timeOut = TimeSpan.FromSeconds(30);
         }
 
@@ -73,7 +75,7 @@ namespace RestSharp.RequestBuilder
             _parameters = new List<Parameter>();
             _method = Method.Get;
             _dataFormat = DataFormat.Json;
-            _cookies = new Dictionary<string, string>();
+            _cookieValues = new HashSet<CookieValue>(new CookieValueComparer());
             _timeOut = TimeSpan.FromSeconds(30);
         }
 
@@ -94,7 +96,7 @@ namespace RestSharp.RequestBuilder
             _parameters = new List<Parameter>();
             _method = method;
             _dataFormat = DataFormat.Json;
-            _cookies = new Dictionary<string, string>();
+            _cookieValues = new HashSet<CookieValue>(new CookieValueComparer());
             _timeOut = TimeSpan.FromSeconds(30);
         }
 
@@ -116,7 +118,7 @@ namespace RestSharp.RequestBuilder
             _parameters = new List<Parameter>();
             _method = method;
             _dataFormat = format;
-            _cookies = new Dictionary<string, string>();
+            _cookieValues = new HashSet<CookieValue>(new CookieValueComparer());
             _timeOut = TimeSpan.FromSeconds(30);
         }
 
@@ -124,11 +126,8 @@ namespace RestSharp.RequestBuilder
 
         #region Public Methods
 
-        /// <summary>
-        /// Add a serialized object to the IRestRequest.
-        /// </summary>
-        /// <param name="body"></param>
-        /// <returns></returns>
+
+        /// <inheritdoc/>
         public IRequestBuilder AddBody(object body)
         {
             if (body is null)
@@ -140,6 +139,7 @@ namespace RestSharp.RequestBuilder
             return this;
         }
 
+        /// <inheritdoc/>
         public IRequestBuilder AddBody<T>(T body, DataFormat dataFormat)
         {
             if (body == null)
@@ -154,14 +154,7 @@ namespace RestSharp.RequestBuilder
             return this;
         }
 
-
-        /// <summary>
-        /// Adds a file to the RestRequest.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="path"></param>
-        /// <param name="contentType"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public IRequestBuilder AddFile(string name, string path, string contentType = null)
         {
             if (string.IsNullOrEmpty(name))
@@ -181,23 +174,15 @@ namespace RestSharp.RequestBuilder
             return this;
         }
 
-        /// <summary>
-        /// Set the DataFormat of the IRestRequest.
-        /// </summary>
-        /// <param name="dataFormat"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public IRequestBuilder SetFormat(DataFormat dataFormat)
         {
             _dataFormat = dataFormat;
             return this;
         }
 
-        /// <summary>
-        /// Add a Header to the IRestRequest.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
+
+        /// <inheritdoc/>
         public IRequestBuilder AddHeader(string name, string value)
         {
             string headerValue = string.Empty;
@@ -216,35 +201,17 @@ namespace RestSharp.RequestBuilder
             return this;
         }
 
-        /// <summary>
-        /// Add Cookie to Request.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public IRequestBuilder AddCookie(string name, string value)
+        /// <inheritdoc/>
+        public IRequestBuilder AddCookie(string name, string value, string path, string domain)
         {
-            string cookieValue = string.Empty;
+            var cookieValue = new CookieValue(name, value, path, domain);
 
-            if (_cookies.TryGetValue(name, out cookieValue))
-            {
-                if (value != cookieValue)
-                {
-                    _cookies[name] = value;
-                }
+            _cookieValues.Add(cookieValue);
 
-                return this;
-            }
-
-            _cookies.Add(name, value);
             return this;
         }
 
-        /// <summary>
-        /// Add Headers to the IRestRequest.
-        /// </summary>
-        /// <param name="headers"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public IRequestBuilder AddHeaders(IDictionary<string, string> headers)
         {
             foreach (var header in headers)
@@ -267,22 +234,14 @@ namespace RestSharp.RequestBuilder
             return this;
         }
 
-        /// <summary>
-        /// Set the Method of the IRestRequest.
-        /// </summary>
-        /// <param name="method"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public IRequestBuilder SetMethod(Method method)
         {
             _method = method;
             return this;
         }
 
-        /// <summary>
-        /// Set the IRestRequest Timeout value.
-        /// </summary>
-        /// <param name="timeout"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public IRequestBuilder SetTimeout(TimeSpan timeout)
         {
             if (timeout == null)
@@ -295,11 +254,8 @@ namespace RestSharp.RequestBuilder
             return this;
         }
 
-        /// <summary>
-        /// Add a Parameter to the IRestRequest.
-        /// </summary>
-        /// <param name="parameter"></param>
-        /// <returns></returns>
+
+        /// <inheritdoc/>
         public IRequestBuilder AddParameter(Parameter parameter)
         {
             if (parameter is null)
@@ -315,11 +271,8 @@ namespace RestSharp.RequestBuilder
             return this;
         }
 
-        /// <summary>
-        /// Add Parameters to the <see cref="RestRequest"/> IRestRequest.
-        /// </summary>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
+
+        /// <inheritdoc/>
         public IRequestBuilder AddParameters(Parameter[] parameters)
         {
             var duplicates = _parameters.Select(x => x).Intersect(parameters);
@@ -345,11 +298,8 @@ namespace RestSharp.RequestBuilder
             return this;
         }
 
-        /// <summary>
-        /// Removes a Header by name.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
+
+        /// <inheritdoc/>
         public IRequestBuilder RemoveHeader(string name)
         {
             if (string.IsNullOrEmpty(name))
@@ -365,41 +315,32 @@ namespace RestSharp.RequestBuilder
             return this;
         }
 
-        /// <summary>
-        /// Removes All Headers.
-        /// </summary>
-        /// <returns></returns>
+
+        /// <inheritdoc/>
         public IRequestBuilder RemoveHeaders()
         {
             _headers.Clear();
             return this;
         }
 
-        /// <summary>
-        /// Removes Cookies.
-        /// </summary>
-        /// <returns></returns>
+
+        /// <inheritdoc/>
         public IRequestBuilder RemoveCookies()
         {
-            _cookies.Clear();
+            _cookieValues.Clear();
             return this;
         }
 
-        /// <summary>
-        /// Removes Parameters.
-        /// </summary>
-        /// <returns></returns>
+
+        /// <inheritdoc/>
         public IRequestBuilder RemoveParameters()
         {
             _parameters.Clear();
             return this;
         }
 
-        /// <summary>
-        /// Remove a Parameter.
-        /// </summary>
-        /// <param name="parameter"></param>
-        /// <returns></returns>
+
+        /// <inheritdoc/>
         public IRequestBuilder RemoveParameter(Parameter parameter)
         {
             if (parameter is null)
@@ -419,10 +360,8 @@ namespace RestSharp.RequestBuilder
             return this;
         }
 
-        /// <summary>
-        /// Creates the IRestRequest object.
-        /// </summary>
-        /// <returns>IRestRequest</returns>
+
+        /// <inheritdoc/>
         public RestRequest Create()
         {
             var request = new RestRequest(_resource, _method);
@@ -444,9 +383,9 @@ namespace RestSharp.RequestBuilder
                 request.AddHeader(header.Key, header.Value);
             }
 
-            foreach (var cookie in _cookies)
+            foreach (var cookie in _cookieValues)
             {
-                request.AddCookie(cookie.Key, cookie.Value, "/", _resource);
+                request.AddCookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain);
             }
 
             if (!string.IsNullOrEmpty(_fileName) && !string.IsNullOrEmpty(_filePath))

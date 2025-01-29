@@ -2,6 +2,7 @@
 using RestSharp;
 using RestSharp.RequestBuilder.Interfaces;
 using System;
+using System.Linq;
 
 namespace RestSharp.RequestBuilder.UnitTests
 {
@@ -43,14 +44,6 @@ namespace RestSharp.RequestBuilder.UnitTests
         }
 
         [TestMethod]
-        public void SetMethod_With_Value_Is_Correct()
-        {
-            var request = _builder.SetMethod(Method.Get).Create();
-
-            Assert.AreEqual(Method.Get, request.Method);
-        }
-
-        [TestMethod]
         public void SetFormat_With_Value_Is_Correct()
         {
             var request = _builder.SetFormat(DataFormat.Json).Create();
@@ -59,25 +52,13 @@ namespace RestSharp.RequestBuilder.UnitTests
         }
 
         [TestMethod]
-        public void AddHeader_With_Value_Is_Created()
-        {
-            var request = _builder
-                .SetFormat(DataFormat.Json)
-                .SetMethod(Method.Get)
-                .AddHeader("test-header", "asdfasdfasdfasdfasdfasdfasdfasdfas")
-                .Create();
-
-            Assert.IsNotNull(request);
-        }
-
-        [TestMethod]
         public void AddHeader_With_Dupe_Header_Returns_Valid_Count_1()
         {
             var request = _builder
                 .SetFormat(DataFormat.Json)
                 .SetMethod(Method.Get)
-                .AddHeader("test-header", "asdfasdfasdfasdfasdfasdfasdfasdfas")
-                .AddHeader("test-header", "asdfasdfasdfasdfasdfasdfasdfasdfas")
+                .AddHeader("test-header", "header-value")
+                .AddHeader("test-header", "header-value")
                 .Create();
 
             Assert.AreEqual(1, _builder.HeaderCount);
@@ -89,7 +70,7 @@ namespace RestSharp.RequestBuilder.UnitTests
             var request = _builder
                 .SetFormat(DataFormat.Json)
                 .SetMethod(Method.Get)
-                .AddHeader("test-header", "asdfasdfasdfasdfasdfasdfasdfasdfas")
+                .AddHeader("test-header", "header-value")
                 .RemoveHeaders()
                 .Create();
 
@@ -108,5 +89,29 @@ namespace RestSharp.RequestBuilder.UnitTests
             Assert.ThrowsException<ArgumentNullException>(() => _builder.RemoveParameter(null));
         }
 
+        [TestMethod]
+        public void AddCookie_With_Values_Is_Correct()
+        {
+            var request = _builder.AddCookie("cookie-name", "cookie-value", "/", "domain.com").Create();
+
+            Assert.AreEqual("cookie-value", request.CookieContainer.GetAllCookies().FirstOrDefault(p => p.Name == "cookie-name").Value);
+        }
+
+        [TestMethod]
+        public void SetMethod_With_Value_Is_Correct()
+        {
+            var request = _builder.SetMethod(Method.Post).Create();
+
+            Assert.AreEqual(Method.Post, request.Method);
+        }
+
+        [TestMethod]
+        public void SetTimeout_With_Value_Is_Correct()
+        {
+            var timeout = TimeSpan.FromSeconds(60);
+            var request = _builder.SetTimeout(timeout).Create();
+
+            Assert.AreEqual(timeout, request.Timeout);
+        }
     }
 }
