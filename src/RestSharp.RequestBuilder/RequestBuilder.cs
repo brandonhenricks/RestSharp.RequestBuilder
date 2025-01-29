@@ -319,7 +319,7 @@ namespace RestSharp.RequestBuilder
             // Iterate over duplicate items.
             foreach (var dup in duplicates)
             {
-                var param = Array.Find(parameters, x => x.Name == dup.Name);
+                var param = Array.Find(parameters, x => string.Equals(x.Name, dup.Name, StringComparison.InvariantCultureIgnoreCase));
 
                 if (param is null) continue;
 
@@ -391,8 +391,8 @@ namespace RestSharp.RequestBuilder
             {
                 throw new ArgumentNullException(nameof(parameter));
             }
-
-            var param = _parameters.Find(p => p.Name == parameter.Name);
+            
+            var param = _parameters.Find(p => string.Equals(p.Name,  parameter.Name, StringComparison.InvariantCultureIgnoreCase));
 
             if (param is null)
             {
