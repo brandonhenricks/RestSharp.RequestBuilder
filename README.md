@@ -33,6 +33,15 @@ var request = builder
 	.Create();
 ```
 
+
+```csharp
+var request = RestRequest.WithBuilder("user")
+	.SetFormat(DataFormat.Json)
+	.SetMethod(Method.GET)
+	.AddHeader("test-header", "value")
+	.Create();
+```
+
 ## License
 
 RestSharp.RequestBuilder is licensed under the [MIT license](LICENSE).
