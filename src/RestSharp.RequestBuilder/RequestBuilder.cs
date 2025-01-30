@@ -80,6 +80,28 @@ namespace RestSharp.RequestBuilder
         }
 
         /// <summary>
+        /// Public Constructor with a Uri argument.
+        /// Uri argument is stored as string.
+        /// </summary>
+        /// <param name="resource"></param>
+        /// <param name="method"></param>
+        public RequestBuilder(Uri resource, Method method)
+        {
+            if (resource is null)
+            {
+                throw new ArgumentNullException(nameof(resource));
+            }
+
+            _resource = resource.ToString();
+            _headers = new Dictionary<string, string>();
+            _parameters = new List<Parameter>();
+            _method = method;
+            _dataFormat = DataFormat.Json;
+            _cookieValues = new HashSet<CookieValue>(new CookieValueComparer());
+            _timeOut = TimeSpan.FromSeconds(30);
+        }
+
+        /// <summary>
         /// RequestBuilder Constructor with <see cref="Method"/> argument.
         /// </summary>
         /// <param name="resource"></param>
