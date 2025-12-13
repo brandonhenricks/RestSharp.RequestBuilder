@@ -232,7 +232,7 @@ namespace RestSharp.RequestBuilder.UnitTests
         [TestMethod]
         public void AddParameters_Empty_Array_Returns_Builder()
         {
-            var result = _builder.AddParameters(new Parameter[0]);
+            var result = _builder.AddParameters(Array.Empty<Parameter>());
             Assert.IsNotNull(result);
             Assert.AreSame(_builder, result);
         }
@@ -274,6 +274,23 @@ namespace RestSharp.RequestBuilder.UnitTests
             Assert.AreEqual(2, request.Parameters.Count);
             Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "param1"));
             Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "param2"));
+        }
+
+        [TestMethod]
+        public void AddParameters_Handles_Duplicates_Within_Input_Array()
+        {
+            var parameters = new Parameter[]
+            {
+                new QueryParameter("param1", "firstValue"),
+                new QueryParameter("param1", "secondValue"),
+                new QueryParameter("param1", "thirdValue")
+            };
+
+            var request = _builder.AddParameters(parameters).Create();
+
+            var matchingParams = request.Parameters.Where(p => p.Name == "param1").ToList();
+            Assert.AreEqual(1, matchingParams.Count);
+            Assert.AreEqual("thirdValue", matchingParams[0].Value);
         }
     }
 }
