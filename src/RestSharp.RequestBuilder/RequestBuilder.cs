@@ -326,14 +326,12 @@ namespace RestSharp.RequestBuilder
                 {
                     // Replace existing
                     _parameters[index] = parameter;
-                    // Update lookup to point to the replaced parameter's current position
-                    existingLookup[parameter.Name] = index;
                 }
                 else
                 {
                     // Add new
                     _parameters.Add(parameter);
-                    // Update lookup to track the new parameter
+                    // Track this parameter to handle duplicates within the input array
                     existingLookup[parameter.Name] = _parameters.Count - 1;
                 }
             }
