@@ -1,8 +1,7 @@
-﻿using RestSharp.RequestBuilder.Interfaces;
-using RestSharp.RequestBuilder.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using RestSharp.RequestBuilder.Interfaces;
+using RestSharp.RequestBuilder.Models;
 
 namespace RestSharp.RequestBuilder
 {
@@ -282,9 +281,9 @@ namespace RestSharp.RequestBuilder
                 throw new ArgumentNullException(nameof(parameter));
             }
 
-            var existingIndex = _parameters.FindIndex(p => 
+            var existingIndex = _parameters.FindIndex(p =>
                 string.Equals(p.Name, parameter.Name, StringComparison.InvariantCultureIgnoreCase));
-            
+
             if (existingIndex >= 0)
             {
                 _parameters[existingIndex] = parameter; // Replace existing
@@ -306,7 +305,7 @@ namespace RestSharp.RequestBuilder
             // Build a lookup for existing parameters by name
             var existingLookup = new Dictionary<string, int>(
                 StringComparer.InvariantCultureIgnoreCase);
-            
+
             for (int i = 0; i < _parameters.Count; i++)
             {
                 // Only store the first occurrence of each name
