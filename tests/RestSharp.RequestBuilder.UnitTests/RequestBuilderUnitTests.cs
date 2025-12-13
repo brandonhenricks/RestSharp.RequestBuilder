@@ -258,5 +258,22 @@ namespace RestSharp.RequestBuilder.UnitTests
             Assert.AreEqual("param3", paramNames[2]);
             Assert.AreEqual("param4", paramNames[3]);
         }
+
+        [TestMethod]
+        public void AddParameters_Skips_Null_Parameters()
+        {
+            var parameters = new Parameter[]
+            {
+                new QueryParameter("param1", "value1"),
+                null,
+                new QueryParameter("param2", "value2")
+            };
+
+            var request = _builder.AddParameters(parameters).Create();
+
+            Assert.AreEqual(2, request.Parameters.Count);
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "param1"));
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "param2"));
+        }
     }
 }

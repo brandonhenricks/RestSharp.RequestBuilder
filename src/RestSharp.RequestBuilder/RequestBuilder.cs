@@ -309,12 +309,19 @@ namespace RestSharp.RequestBuilder
             
             for (int i = 0; i < _parameters.Count; i++)
             {
-                existingLookup[_parameters[i].Name] = i;
+                // Only store the first occurrence of each name
+                if (!existingLookup.ContainsKey(_parameters[i].Name))
+                {
+                    existingLookup[_parameters[i].Name] = i;
+                }
             }
 
             // Process new parameters
             foreach (var parameter in parameters)
             {
+                if (parameter == null)
+                    continue;
+
                 if (existingLookup.TryGetValue(parameter.Name, out int index))
                 {
                     // Replace existing
