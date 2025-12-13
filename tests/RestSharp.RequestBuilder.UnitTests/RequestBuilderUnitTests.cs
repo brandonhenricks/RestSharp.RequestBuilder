@@ -112,5 +112,151 @@ namespace RestSharp.RequestBuilder.UnitTests
 
             Assert.AreEqual(timeout, request.Timeout);
         }
+
+        [TestMethod]
+        public void AddParameter_Null_Argument_Throws_Exception()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => _builder.AddParameter(null));
+        }
+
+        [TestMethod]
+        public void AddParameter_New_Parameter_Is_Added()
+        {
+            var param = new QueryParameter("test-param", "test-value");
+            var request = _builder.AddParameter(param).Create();
+
+            var addedParam = request.Parameters.FirstOrDefault(p => p.Name == "test-param");
+            Assert.IsNotNull(addedParam);
+            Assert.AreEqual("test-value", addedParam.Value);
+        }
+
+        [TestMethod]
+        public void AddParameter_Duplicate_Parameter_Is_Replaced()
+        {
+            var param1 = new QueryParameter("test-param", "value1");
+            var param2 = new QueryParameter("test-param", "value2");
+            
+            var request = _builder
+                .AddParameter(param1)
+                .AddParameter(param2)
+                .Create();
+
+            var matchingParams = request.Parameters.Where(p => p.Name == "test-param").ToList();
+            Assert.AreEqual(1, matchingParams.Count);
+            Assert.AreEqual("value2", matchingParams[0].Value);
+        }
+
+        [TestMethod]
+        public void AddParameter_Case_Insensitive_Duplicate_Is_Replaced()
+        {
+            var param1 = new QueryParameter("Test-Param", "value1");
+            var param2 = new QueryParameter("test-param", "value2");
+            
+            var request = _builder
+                .AddParameter(param1)
+                .AddParameter(param2)
+                .Create();
+
+            var matchingParams = request.Parameters.Where(p => 
+                string.Equals(p.Name, "test-param", StringComparison.InvariantCultureIgnoreCase)).ToList();
+            Assert.AreEqual(1, matchingParams.Count);
+            Assert.AreEqual("value2", matchingParams[0].Value);
+        }
+
+        [TestMethod]
+        public void AddParameters_All_New_Parameters_Are_Added()
+        {
+            var parameters = new Parameter[]
+            {
+                new QueryParameter("param1", "value1"),
+                new QueryParameter("param2", "value2"),
+                new QueryParameter("param3", "value3")
+            };
+
+            var request = _builder.AddParameters(parameters).Create();
+
+            Assert.AreEqual(3, request.Parameters.Count);
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "param1"));
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "param2"));
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "param3"));
+        }
+
+        [TestMethod]
+        public void AddParameters_Duplicate_Parameters_Are_Replaced()
+        {
+            var param1 = new QueryParameter("param1", "oldValue");
+            _builder.AddParameter(param1);
+
+            var parameters = new Parameter[]
+            {
+                new QueryParameter("param1", "newValue"),
+                new QueryParameter("param2", "value2")
+            };
+
+            var request = _builder.AddParameters(parameters).Create();
+
+            var matchingParams = request.Parameters.Where(p => p.Name == "param1").ToList();
+            Assert.AreEqual(1, matchingParams.Count);
+            Assert.AreEqual("newValue", matchingParams[0].Value);
+            Assert.AreEqual(2, request.Parameters.Count);
+        }
+
+        [TestMethod]
+        public void AddParameters_Case_Insensitive_Duplicates_Are_Replaced()
+        {
+            var param1 = new QueryParameter("Param1", "oldValue");
+            _builder.AddParameter(param1);
+
+            var parameters = new Parameter[]
+            {
+                new QueryParameter("param1", "newValue"),
+                new QueryParameter("PARAM2", "value2")
+            };
+
+            var request = _builder.AddParameters(parameters).Create();
+
+            var matchingParams = request.Parameters.Where(p => 
+                string.Equals(p.Name, "param1", StringComparison.InvariantCultureIgnoreCase)).ToList();
+            Assert.AreEqual(1, matchingParams.Count);
+            Assert.AreEqual("newValue", matchingParams[0].Value);
+        }
+
+        [TestMethod]
+        public void AddParameters_Null_Array_Returns_Builder()
+        {
+            var result = _builder.AddParameters(null);
+            Assert.IsNotNull(result);
+            Assert.AreSame(_builder, result);
+        }
+
+        [TestMethod]
+        public void AddParameters_Empty_Array_Returns_Builder()
+        {
+            var result = _builder.AddParameters(new Parameter[0]);
+            Assert.IsNotNull(result);
+            Assert.AreSame(_builder, result);
+        }
+
+        [TestMethod]
+        public void AddParameters_Preserves_Insertion_Order()
+        {
+            var param1 = new QueryParameter("param1", "value1");
+            var param2 = new QueryParameter("param2", "value2");
+            _builder.AddParameter(param1).AddParameter(param2);
+
+            var parameters = new Parameter[]
+            {
+                new QueryParameter("param3", "value3"),
+                new QueryParameter("param4", "value4")
+            };
+
+            var request = _builder.AddParameters(parameters).Create();
+
+            var paramNames = request.Parameters.Select(p => p.Name).ToList();
+            Assert.AreEqual("param1", paramNames[0]);
+            Assert.AreEqual("param2", paramNames[1]);
+            Assert.AreEqual("param3", paramNames[2]);
+            Assert.AreEqual("param4", paramNames[3]);
+        }
     }
 }

@@ -282,7 +282,14 @@ namespace RestSharp.RequestBuilder
                 throw new ArgumentNullException(nameof(parameter));
             }
 
-            if (!_parameters.Contains(parameter))
+            var existingIndex = _parameters.FindIndex(p => 
+                string.Equals(p.Name, parameter.Name, StringComparison.InvariantCultureIgnoreCase));
+            
+            if (existingIndex >= 0)
+            {
+                _parameters[existingIndex] = parameter; // Replace existing
+            }
+            else
             {
                 _parameters.Add(parameter);
             }
@@ -293,24 +300,31 @@ namespace RestSharp.RequestBuilder
         /// <inheritdoc/>
         public IRequestBuilder AddParameters(Parameter[] parameters)
         {
-            var duplicates = _parameters.Select(x => x).Intersect(parameters);
-
-            // Check for duplicates.
-            if (!duplicates.Any())
-            {
-                _parameters.AddRange(parameters);
+            if (parameters == null || parameters.Length == 0)
                 return this;
+
+            // Build a lookup for existing parameters by name
+            var existingLookup = new Dictionary<string, int>(
+                StringComparer.InvariantCultureIgnoreCase);
+            
+            for (int i = 0; i < _parameters.Count; i++)
+            {
+                existingLookup[_parameters[i].Name] = i;
             }
 
-            // Iterate over duplicate items.
-            foreach (var dup in duplicates)
+            // Process new parameters
+            foreach (var parameter in parameters)
             {
-                var param = Array.Find(parameters, x => string.Equals(x.Name, dup.Name, StringComparison.InvariantCultureIgnoreCase));
-
-                if (param is null) continue;
-
-                _parameters.Remove(dup);
-                _parameters.Add(param);
+                if (existingLookup.TryGetValue(parameter.Name, out int index))
+                {
+                    // Replace existing
+                    _parameters[index] = parameter;
+                }
+                else
+                {
+                    // Add new
+                    _parameters.Add(parameter);
+                }
             }
 
             return this;
