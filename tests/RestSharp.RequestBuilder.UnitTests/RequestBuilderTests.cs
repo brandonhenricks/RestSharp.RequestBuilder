@@ -1109,5 +1109,311 @@ namespace RestSharp.RequestBuilder.UnitTests
             var authValue = authHeaders[0].Value as string;
             Assert.IsTrue(authValue.StartsWith("Basic "));
         }
+
+        // --- AddJsonBody ---
+        [TestMethod]
+        public void AddJsonBody_Null_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.AddJsonBody<object>(null));
+        }
+
+        [TestMethod]
+        public void AddJsonBody_Sets_Json_Format()
+        {
+            var builder = new RequestBuilder("resource");
+            var body = new { name = "test", value = 123 };
+            var request = builder.AddJsonBody(body).Create();
+            Assert.AreEqual(DataFormat.Json, request.RequestFormat);
+        }
+
+        [TestMethod]
+        public void AddJsonBody_Sets_Body()
+        {
+            var builder = new RequestBuilder("resource");
+            var body = new { name = "test", value = 123 };
+            var request = builder.AddJsonBody(body).Create();
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Type == ParameterType.RequestBody));
+        }
+
+        [TestMethod]
+        public void AddJsonBody_With_String()
+        {
+            var builder = new RequestBuilder("resource");
+            var body = "test string body";
+            var request = builder.AddJsonBody(body).Create();
+            Assert.AreEqual(DataFormat.Json, request.RequestFormat);
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Type == ParameterType.RequestBody));
+        }
+
+        [TestMethod]
+        public void AddJsonBody_With_Complex_Object()
+        {
+            var builder = new RequestBuilder("resource");
+            var body = new TestUser { Id = 1, Name = "John", Email = "john@example.com" };
+            var request = builder.AddJsonBody(body).Create();
+            Assert.AreEqual(DataFormat.Json, request.RequestFormat);
+            var bodyParam = request.Parameters.FirstOrDefault(p => p.Type == ParameterType.RequestBody);
+            Assert.IsNotNull(bodyParam);
+        }
+
+        [TestMethod]
+        public void AddJsonBody_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.AddJsonBody(new { test = "value" });
+            Assert.AreSame(builder, result);
+        }
+
+        [TestMethod]
+        public void AddJsonBody_Replaces_Previous_Body()
+        {
+            var builder = new RequestBuilder("resource");
+            var body1 = new { name = "first" };
+            var body2 = new { name = "second" };
+            builder.AddJsonBody(body1);
+            var request = builder.AddJsonBody(body2).Create();
+            Assert.AreEqual(DataFormat.Json, request.RequestFormat);
+        }
+
+        [TestMethod]
+        public void AddJsonBody_Overrides_Previous_Format()
+        {
+            var builder = new RequestBuilder("resource", Method.Post, DataFormat.Xml);
+            var body = new { name = "test" };
+            var request = builder.AddJsonBody(body).Create();
+            Assert.AreEqual(DataFormat.Json, request.RequestFormat);
+        }
+
+        // --- AddXmlBody ---
+        [TestMethod]
+        public void AddXmlBody_Null_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.AddXmlBody<object>(null));
+        }
+
+        [TestMethod]
+        public void AddXmlBody_Sets_Xml_Format()
+        {
+            var builder = new RequestBuilder("resource");
+            var body = new TestUser { Id = 1, Name = "John", Email = "john@example.com" };
+            var request = builder.AddXmlBody(body).Create();
+            Assert.AreEqual(DataFormat.Xml, request.RequestFormat);
+        }
+
+        [TestMethod]
+        public void AddXmlBody_Sets_Body()
+        {
+            var builder = new RequestBuilder("resource");
+            var body = new TestUser { Id = 1, Name = "John", Email = "john@example.com" };
+            var request = builder.AddXmlBody(body).Create();
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Type == ParameterType.RequestBody));
+        }
+
+        [TestMethod]
+        public void AddXmlBody_With_String()
+        {
+            var builder = new RequestBuilder("resource");
+            var body = "<root><item>test</item></root>";
+            var request = builder.AddXmlBody(body).Create();
+            Assert.AreEqual(DataFormat.Xml, request.RequestFormat);
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Type == ParameterType.RequestBody));
+        }
+
+        [TestMethod]
+        public void AddXmlBody_With_Complex_Object()
+        {
+            var builder = new RequestBuilder("resource");
+            var body = new TestUser { Id = 2, Name = "Jane", Email = "jane@example.com" };
+            var request = builder.AddXmlBody(body).Create();
+            Assert.AreEqual(DataFormat.Xml, request.RequestFormat);
+            var bodyParam = request.Parameters.FirstOrDefault(p => p.Type == ParameterType.RequestBody);
+            Assert.IsNotNull(bodyParam);
+        }
+
+        [TestMethod]
+        public void AddXmlBody_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.AddXmlBody(new TestUser { Id = 1, Name = "Test" });
+            Assert.AreSame(builder, result);
+        }
+
+        [TestMethod]
+        public void AddXmlBody_Replaces_Previous_Body()
+        {
+            var builder = new RequestBuilder("resource");
+            var body1 = new TestUser { Id = 1, Name = "first" };
+            var body2 = new TestUser { Id = 2, Name = "second" };
+            builder.AddXmlBody(body1);
+            var request = builder.AddXmlBody(body2).Create();
+            Assert.AreEqual(DataFormat.Xml, request.RequestFormat);
+        }
+
+        [TestMethod]
+        public void AddXmlBody_Overrides_Previous_Format()
+        {
+            var builder = new RequestBuilder("resource", Method.Post, DataFormat.Json);
+            var body = new TestUser { Id = 1, Name = "test" };
+            var request = builder.AddXmlBody(body).Create();
+            Assert.AreEqual(DataFormat.Xml, request.RequestFormat);
+        }
+
+        // --- AddFormUrlEncodedBody ---
+        [TestMethod]
+        public void AddFormUrlEncodedBody_Null_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.AddFormUrlEncodedBody(null));
+        }
+
+        [TestMethod]
+        public void AddFormUrlEncodedBody_Empty_Dictionary_Returns_Builder()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.AddFormUrlEncodedBody(new Dictionary<string, string>());
+            Assert.AreSame(builder, result);
+        }
+
+        [TestMethod]
+        public void AddFormUrlEncodedBody_Adds_Parameters()
+        {
+            var builder = new RequestBuilder("resource");
+            var formData = new Dictionary<string, string>
+            {
+                { "grant_type", "password" },
+                { "username", "testuser" },
+                { "password", "testpass" }
+            };
+            var request = builder.AddFormUrlEncodedBody(formData).Create();
+            Assert.AreEqual(3, request.Parameters.Count);
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "grant_type" && p.Type == ParameterType.GetOrPost));
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "username" && p.Type == ParameterType.GetOrPost));
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "password" && p.Type == ParameterType.GetOrPost));
+        }
+
+        [TestMethod]
+        public void AddFormUrlEncodedBody_Parameter_Values_Are_Correct()
+        {
+            var builder = new RequestBuilder("resource");
+            var formData = new Dictionary<string, string>
+            {
+                { "grant_type", "password" },
+                { "username", "testuser" }
+            };
+            var request = builder.AddFormUrlEncodedBody(formData).Create();
+            var grantType = request.Parameters.FirstOrDefault(p => p.Name == "grant_type");
+            var username = request.Parameters.FirstOrDefault(p => p.Name == "username");
+            Assert.AreEqual("password", grantType?.Value);
+            Assert.AreEqual("testuser", username?.Value);
+        }
+
+        [TestMethod]
+        public void AddFormUrlEncodedBody_Skips_Null_Values()
+        {
+            var builder = new RequestBuilder("resource");
+            var formData = new Dictionary<string, string>
+            {
+                { "field1", "value1" },
+                { "field2", null },
+                { "field3", "value3" }
+            };
+            var request = builder.AddFormUrlEncodedBody(formData).Create();
+            Assert.AreEqual(2, request.Parameters.Count);
+            Assert.IsNull(request.Parameters.FirstOrDefault(p => p.Name == "field2"));
+        }
+
+        [TestMethod]
+        public void AddFormUrlEncodedBody_Replaces_Existing_Parameters()
+        {
+            var builder = new RequestBuilder("resource");
+            builder.AddParameter(new GetOrPostParameter("grant_type", "client_credentials"));
+            var formData = new Dictionary<string, string>
+            {
+                { "grant_type", "password" },
+                { "username", "testuser" }
+            };
+            var request = builder.AddFormUrlEncodedBody(formData).Create();
+            var matchingParams = request.Parameters.Where(p => p.Name == "grant_type").ToList();
+            Assert.AreEqual(1, matchingParams.Count);
+            Assert.AreEqual("password", matchingParams[0].Value);
+        }
+
+        [TestMethod]
+        public void AddFormUrlEncodedBody_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.AddFormUrlEncodedBody(new Dictionary<string, string> { { "key", "value" } });
+            Assert.AreSame(builder, result);
+        }
+
+        [TestMethod]
+        public void AddFormUrlEncodedBody_With_Special_Characters()
+        {
+            var builder = new RequestBuilder("resource");
+            var formData = new Dictionary<string, string>
+            {
+                { "email", "user@example.com" },
+                { "redirect_uri", "https://example.com/callback?param=value" }
+            };
+            var request = builder.AddFormUrlEncodedBody(formData).Create();
+            Assert.AreEqual(2, request.Parameters.Count);
+            Assert.AreEqual("user@example.com", request.Parameters.FirstOrDefault(p => p.Name == "email")?.Value);
+            Assert.AreEqual("https://example.com/callback?param=value", request.Parameters.FirstOrDefault(p => p.Name == "redirect_uri")?.Value);
+        }
+
+        // --- Integration Tests ---
+        [TestMethod]
+        public void FluentChaining_With_AddJsonBody()
+        {
+            var request = new RestRequest().WithBuilder("api/users")
+                .SetMethod(Method.Post)
+                .AddJsonBody(new { name = "John", email = "john@example.com" })
+                .AddHeader("Content-Type", "application/json")
+                .Create();
+
+            Assert.AreEqual(Method.Post, request.Method);
+            Assert.AreEqual(DataFormat.Json, request.RequestFormat);
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Type == ParameterType.RequestBody));
+        }
+
+        [TestMethod]
+        public void FluentChaining_With_AddXmlBody()
+        {
+            var request = new RestRequest().WithBuilder("api/users")
+                .SetMethod(Method.Post)
+                .AddXmlBody(new TestUser { Id = 1, Name = "John" })
+                .Create();
+
+            Assert.AreEqual(Method.Post, request.Method);
+            Assert.AreEqual(DataFormat.Xml, request.RequestFormat);
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Type == ParameterType.RequestBody));
+        }
+
+        [TestMethod]
+        public void FluentChaining_With_AddFormUrlEncodedBody()
+        {
+            var request = new RestRequest().WithBuilder("oauth/token")
+                .SetMethod(Method.Post)
+                .AddFormUrlEncodedBody(new Dictionary<string, string>
+                {
+                    { "grant_type", "password" },
+                    { "username", "user" },
+                    { "password", "pass" }
+                })
+                .Create();
+
+            Assert.AreEqual(Method.Post, request.Method);
+            Assert.AreEqual(3, request.Parameters.Count);
+        }
+
+        // Helper class for testing
+        private class TestUser
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string Email { get; set; }
+        }
     }
 }

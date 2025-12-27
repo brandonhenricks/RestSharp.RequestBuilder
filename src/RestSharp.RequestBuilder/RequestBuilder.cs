@@ -175,6 +175,54 @@ namespace RestSharp.RequestBuilder
         }
 
         /// <inheritdoc/>
+        public IRequestBuilder AddJsonBody<T>(T body) where T : class
+        {
+            if (body == null)
+            {
+                throw new ArgumentNullException(nameof(body));
+            }
+
+            _body = body;
+            _dataFormat = DataFormat.Json;
+
+            return this;
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder AddXmlBody<T>(T body) where T : class
+        {
+            if (body == null)
+            {
+                throw new ArgumentNullException(nameof(body));
+            }
+
+            _body = body;
+            _dataFormat = DataFormat.Xml;
+
+            return this;
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder AddFormUrlEncodedBody(IDictionary<string, string> data)
+        {
+            if (data is null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            foreach (var kvp in data)
+            {
+                if (kvp.Value is null)
+                    continue;
+
+                var parameter = new GetOrPostParameter(kvp.Key, kvp.Value);
+                AddParameter(parameter);
+            }
+
+            return this;
+        }
+
+        /// <inheritdoc/>
         public IRequestBuilder AddFile(string name, string path, string contentType = null)
         {
             if (string.IsNullOrEmpty(name))

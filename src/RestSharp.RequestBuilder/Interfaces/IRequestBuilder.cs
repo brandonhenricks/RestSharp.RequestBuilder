@@ -55,6 +55,32 @@ namespace RestSharp.RequestBuilder.Interfaces
         IRequestBuilder AddBody<T>(T body, DataFormat dataFormat) where T : class;
 
         /// <summary>
+        /// Adds a JSON body to the request.
+        /// Sets the request format to JSON and adds the body.
+        /// </summary>
+        /// <typeparam name="T">The type of the body.</typeparam>
+        /// <param name="body">The body to add. Will be serialized as JSON.</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder AddJsonBody<T>(T body) where T : class;
+
+        /// <summary>
+        /// Adds an XML body to the request.
+        /// Sets the request format to XML and adds the body.
+        /// </summary>
+        /// <typeparam name="T">The type of the body.</typeparam>
+        /// <param name="body">The body to add. Will be serialized as XML.</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder AddXmlBody<T>(T body) where T : class;
+
+        /// <summary>
+        /// Adds a form URL encoded body to the request.
+        /// Adds each key-value pair as a GetOrPost parameter.
+        /// </summary>
+        /// <param name="data">Dictionary of form data to add.</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder AddFormUrlEncodedBody(IDictionary<string, string> data);
+
+        /// <summary>
         /// Adds a file to the request.
         /// </summary>
         /// <param name="name">The name of the file parameter.</param>
