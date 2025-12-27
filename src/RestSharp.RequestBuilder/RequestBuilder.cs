@@ -503,7 +503,7 @@ namespace RestSharp.RequestBuilder
                 throw new ArgumentNullException(nameof(accessToken));
             }
 
-            return AddHeader("Authorization", $"Bearer {accessToken}");
+            return WithBearerToken(accessToken);
         }
 
         /// <inheritdoc/>
