@@ -110,10 +110,32 @@ namespace RestSharp.RequestBuilder.Interfaces
         /// Adds a file from a stream to the request.
         /// </summary>
         /// <param name="name">The name of the file parameter.</param>
-        /// <param name="stream">The stream containing file data.</param>
+        /// <param name="stream">
+        /// The stream containing the file data. The caller is responsible for keeping this stream
+        /// open and readable until the created <c>RestRequest</c> is executed by RestSharp.
+        /// Do not dispose the stream immediately after calling <c>Create()</c> on the builder.
+        /// The stream content will be read by RestSharp when the request is executed, not when
+        /// <see cref="AddFileStream(string,System.IO.Stream,string,string)"/> or <c>Create()</c> is called.
+        /// </param>
         /// <param name="fileName">The file name to use.</param>
         /// <param name="contentType">The content type of the file. Optional.</param>
         /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        /// <remarks>
+        /// <para>
+        /// Stream lifecycle guidelines:
+        /// </para>
+        /// <list type="number">
+        ///   <item>
+        ///     <description>The caller is responsible for keeping the stream alive until the <c>RestRequest</c> is executed.</description>
+        ///   </item>
+        ///   <item>
+        ///     <description>The stream should not be disposed immediately after <c>Create()</c> is called on the builder.</description>
+        ///   </item>
+        ///   <item>
+        ///     <description>The stream will be read when RestSharp executes the request, not during <see cref="AddFileStream(string,System.IO.Stream,string,string)"/> or <c>Create()</c>.</description>
+        ///   </item>
+        /// </list>
+        /// </remarks>
         IRequestBuilder AddFileStream(string name, System.IO.Stream stream, string fileName, string contentType = null);
 
         /// <summary>
