@@ -177,7 +177,7 @@ namespace RestSharp.RequestBuilder
         /// <inheritdoc/>
         public IRequestBuilder AddJsonBody<T>(T body) where T : class
         {
-            if (body == null)
+            if (body is null)
             {
                 throw new ArgumentNullException(nameof(body));
             }
@@ -191,7 +191,7 @@ namespace RestSharp.RequestBuilder
         /// <inheritdoc/>
         public IRequestBuilder AddXmlBody<T>(T body) where T : class
         {
-            if (body == null)
+            if (body is null)
             {
                 throw new ArgumentNullException(nameof(body));
             }
