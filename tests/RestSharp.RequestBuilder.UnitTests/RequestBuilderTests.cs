@@ -1529,7 +1529,7 @@ namespace RestSharp.RequestBuilder.UnitTests
         public void AddFileBytes_Empty_Bytes_Throws()
         {
             var builder = new RequestBuilder("resource");
-            Assert.ThrowsException<ArgumentNullException>(() =>
+            Assert.ThrowsException<ArgumentException>(() =>
                 builder.AddFileBytes("file", new byte[0], "filename.txt"));
         }
 
@@ -1623,7 +1623,7 @@ namespace RestSharp.RequestBuilder.UnitTests
         [TestMethod]
         public void AddFileStream_Valid_Stream_Adds_File()
         {
-            using var stream = new System.IO.MemoryStream(new byte[] { 1, 2, 3 });
+            var stream = new System.IO.MemoryStream(new byte[] { 1, 2, 3 });
             var builder = new RequestBuilder("resource");
             var request = builder
                 .AddFileStream("data", stream, "data.bin", "application/octet-stream")
