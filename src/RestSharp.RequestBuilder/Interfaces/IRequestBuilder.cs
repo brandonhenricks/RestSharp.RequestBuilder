@@ -78,6 +78,29 @@ namespace RestSharp.RequestBuilder.Interfaces
         IRequestBuilder AddParameters(Parameter[] parameters);
 
         /// <summary>
+        /// Adds a query string parameter to the request.
+        /// </summary>
+        /// <param name="name">The name of the query parameter.</param>
+        /// <param name="value">The value of the query parameter. Will be converted to string using InvariantCulture.</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder AddQueryParameter(string name, object value);
+
+        /// <summary>
+        /// Adds multiple query string parameters to the request.
+        /// </summary>
+        /// <param name="parameters">A dictionary of query parameters to add.</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder AddQueryParameters(IDictionary<string, object> parameters);
+
+        /// <summary>
+        /// Adds a URL segment parameter to the request.
+        /// </summary>
+        /// <param name="name">The name of the URL segment.</param>
+        /// <param name="value">The value of the URL segment.</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder AddUrlSegment(string name, string value);
+
+        /// <summary>
         /// Removes all headers from the request.
         /// </summary>
         /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
