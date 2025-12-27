@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using RestSharp.RequestBuilder.Interfaces;
 using RestSharp.RequestBuilder.Models;
 
@@ -210,10 +211,12 @@ namespace RestSharp.RequestBuilder
                 throw new ArgumentNullException(nameof(data));
             }
 
-            foreach (var kvp in data)
+            foreach (var kvp in data.Where(kvp => kvp.Value != null))
             {
-                if (kvp.Value is null)
-                    continue;
+                if (string.IsNullOrEmpty(kvp.Key))
+                {
+                    throw new ArgumentException("Dictionary keys cannot be null or empty.", nameof(data));
+                }
 
                 var parameter = new GetOrPostParameter(kvp.Key, kvp.Value);
                 AddParameter(parameter);

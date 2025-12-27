@@ -177,6 +177,12 @@ The `AddFormUrlEncodedBody` method adds each key-value pair as a form parameter 
 - Setting a new body replaces any previously set body
 - Full XML documentation for IntelliSense support
 
+**Important:** Do not mix `AddJsonBody`/`AddXmlBody` with `AddFormUrlEncodedBody` on the same request builder. These represent mutually exclusive ways of sending data:
+- `AddJsonBody`/`AddXmlBody` set a request body (serialized as JSON or XML)
+- `AddFormUrlEncodedBody` adds form parameters (sent as `application/x-www-form-urlencoded`)
+
+Choose one approach based on your API requirements. Mixing both would create a semantically invalid request.
+
 **Note:** These methods work with RestSharp's serialization pipeline. For JSON, ensure you have configured an appropriate JSON serializer (RestSharp uses `System.Text.Json` by default). For XML, RestSharp uses the built-in .NET XML serializer.
 
 ## License

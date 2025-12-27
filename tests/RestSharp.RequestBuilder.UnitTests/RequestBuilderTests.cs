@@ -1174,6 +1174,8 @@ namespace RestSharp.RequestBuilder.UnitTests
             builder.AddJsonBody(body1);
             var request = builder.AddJsonBody(body2).Create();
             Assert.AreEqual(DataFormat.Json, request.RequestFormat);
+            var bodyParams = request.Parameters.Where(p => p.Type == ParameterType.RequestBody).ToList();
+            Assert.AreEqual(1, bodyParams.Count, "Should have exactly one body parameter");
         }
 
         [TestMethod]
@@ -1249,6 +1251,8 @@ namespace RestSharp.RequestBuilder.UnitTests
             builder.AddXmlBody(body1);
             var request = builder.AddXmlBody(body2).Create();
             Assert.AreEqual(DataFormat.Xml, request.RequestFormat);
+            var bodyParams = request.Parameters.Where(p => p.Type == ParameterType.RequestBody).ToList();
+            Assert.AreEqual(1, bodyParams.Count, "Should have exactly one body parameter");
         }
 
         [TestMethod]
@@ -1266,6 +1270,17 @@ namespace RestSharp.RequestBuilder.UnitTests
         {
             var builder = new RequestBuilder("resource");
             Assert.ThrowsException<ArgumentNullException>(() => builder.AddFormUrlEncodedBody(null));
+        }
+
+        [TestMethod]
+        public void AddFormUrlEncodedBody_Empty_Key_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            var formData = new Dictionary<string, string>
+            {
+                { "", "value" }
+            };
+            Assert.ThrowsException<ArgumentException>(() => builder.AddFormUrlEncodedBody(formData));
         }
 
         [TestMethod]
