@@ -800,7 +800,7 @@ namespace RestSharp.RequestBuilder.UnitTests
                 .AddQueryParameter("limit", 50)
                 .SetMethod(Method.Get)
                 .Create();
-            
+
             Assert.AreEqual(Method.Get, request.Method);
             Assert.AreEqual(3, request.Parameters.Count);
             Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "id" && p.Type == ParameterType.UrlSegment));
@@ -819,11 +819,295 @@ namespace RestSharp.RequestBuilder.UnitTests
                     { "sort", "desc" }
                 })
                 .Create();
-            
+
             Assert.AreEqual(3, request.Parameters.Count);
             Assert.AreEqual("123", request.Parameters.FirstOrDefault(p => p.Name == "id")?.Value);
             Assert.AreEqual("1", request.Parameters.FirstOrDefault(p => p.Name == "page")?.Value);
             Assert.AreEqual("desc", request.Parameters.FirstOrDefault(p => p.Name == "sort")?.Value);
+        }
+
+        // --- Authentication Methods ---
+        [TestMethod]
+        public void WithBearerToken_Null_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithBearerToken(null));
+        }
+
+        [TestMethod]
+        public void WithBearerToken_Empty_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithBearerToken(""));
+        }
+
+        [TestMethod]
+        public void WithBearerToken_Adds_Authorization_Header()
+        {
+            var builder = new RequestBuilder("resource");
+            var token = "mySecretToken123";
+            var request = builder.WithBearerToken(token).Create();
+            var authHeader = request.Parameters.FirstOrDefault(p => p.Name == "Authorization" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(authHeader);
+            Assert.AreEqual($"Bearer {token}", authHeader.Value);
+        }
+
+        [TestMethod]
+        public void WithBearerToken_Replaces_Existing_Authorization()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder
+                .WithBearerToken("oldToken")
+                .WithBearerToken("newToken")
+                .Create();
+            var authHeaders = request.Parameters.Where(p => p.Name == "Authorization" && p.Type == ParameterType.HttpHeader).ToList();
+            Assert.AreEqual(1, authHeaders.Count);
+            Assert.AreEqual("Bearer newToken", authHeaders[0].Value);
+        }
+
+        [TestMethod]
+        public void WithBearerToken_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.WithBearerToken("token");
+            Assert.AreSame(builder, result);
+        }
+
+        [TestMethod]
+        public void WithBasicAuth_Null_Username_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithBasicAuth(null, "password"));
+        }
+
+        [TestMethod]
+        public void WithBasicAuth_Empty_Username_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithBasicAuth("", "password"));
+        }
+
+        [TestMethod]
+        public void WithBasicAuth_Null_Password_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithBasicAuth("user", null));
+        }
+
+        [TestMethod]
+        public void WithBasicAuth_Empty_Password_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithBasicAuth("user", ""));
+        }
+
+        [TestMethod]
+        public void WithBasicAuth_Adds_Authorization_Header()
+        {
+            var builder = new RequestBuilder("resource");
+            var username = "testuser";
+            var password = "testpass";
+            var request = builder.WithBasicAuth(username, password).Create();
+            var authHeader = request.Parameters.FirstOrDefault(p => p.Name == "Authorization" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(authHeader);
+
+            // Verify it starts with "Basic "
+            var authValue = authHeader.Value as string;
+            Assert.IsTrue(authValue.StartsWith("Basic "));
+
+            // Decode and verify the credentials
+            var encodedPart = authValue.Substring(6);
+            var decoded = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encodedPart));
+            Assert.AreEqual($"{username}:{password}", decoded);
+        }
+
+        [TestMethod]
+        public void WithBasicAuth_Replaces_Existing_Authorization()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder
+                .WithBasicAuth("user1", "pass1")
+                .WithBasicAuth("user2", "pass2")
+                .Create();
+            var authHeaders = request.Parameters.Where(p => p.Name == "Authorization" && p.Type == ParameterType.HttpHeader).ToList();
+            Assert.AreEqual(1, authHeaders.Count);
+
+            // Verify the second auth is used
+            var authValue = authHeaders[0].Value as string;
+            var encodedPart = authValue.Substring(6);
+            var decoded = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encodedPart));
+            Assert.AreEqual("user2:pass2", decoded);
+        }
+
+        [TestMethod]
+        public void WithBasicAuth_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.WithBasicAuth("user", "pass");
+            Assert.AreSame(builder, result);
+        }
+
+        [TestMethod]
+        public void WithApiKey_Null_Key_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithApiKey(null));
+        }
+
+        [TestMethod]
+        public void WithApiKey_Empty_Key_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithApiKey(""));
+        }
+
+        [TestMethod]
+        public void WithApiKey_Null_HeaderName_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithApiKey("key123", null));
+        }
+
+        [TestMethod]
+        public void WithApiKey_Empty_HeaderName_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithApiKey("key123", ""));
+        }
+
+        [TestMethod]
+        public void WithApiKey_Adds_Default_Header()
+        {
+            var builder = new RequestBuilder("resource");
+            var apiKey = "myApiKey123";
+            var request = builder.WithApiKey(apiKey).Create();
+            var apiKeyHeader = request.Parameters.FirstOrDefault(p => p.Name == "X-API-Key" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(apiKeyHeader);
+            Assert.AreEqual(apiKey, apiKeyHeader.Value);
+        }
+
+        [TestMethod]
+        public void WithApiKey_Adds_Custom_Header()
+        {
+            var builder = new RequestBuilder("resource");
+            var apiKey = "myApiKey123";
+            var headerName = "X-Custom-Api-Key";
+            var request = builder.WithApiKey(apiKey, headerName).Create();
+            var apiKeyHeader = request.Parameters.FirstOrDefault(p => p.Name == headerName && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(apiKeyHeader);
+            Assert.AreEqual(apiKey, apiKeyHeader.Value);
+        }
+
+        [TestMethod]
+        public void WithApiKey_Replaces_Existing_Key()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder
+                .WithApiKey("oldKey")
+                .WithApiKey("newKey")
+                .Create();
+            var apiKeyHeaders = request.Parameters.Where(p => p.Name == "X-API-Key" && p.Type == ParameterType.HttpHeader).ToList();
+            Assert.AreEqual(1, apiKeyHeaders.Count);
+            Assert.AreEqual("newKey", apiKeyHeaders[0].Value);
+        }
+
+        [TestMethod]
+        public void WithApiKey_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.WithApiKey("key");
+            Assert.AreSame(builder, result);
+        }
+
+        [TestMethod]
+        public void WithOAuth2_Null_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithOAuth2(null));
+        }
+
+        [TestMethod]
+        public void WithOAuth2_Empty_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithOAuth2(""));
+        }
+
+        [TestMethod]
+        public void WithOAuth2_Adds_Authorization_Header()
+        {
+            var builder = new RequestBuilder("resource");
+            var accessToken = "oauth2AccessToken123";
+            var request = builder.WithOAuth2(accessToken).Create();
+            var authHeader = request.Parameters.FirstOrDefault(p => p.Name == "Authorization" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(authHeader);
+            Assert.AreEqual($"Bearer {accessToken}", authHeader.Value);
+        }
+
+        [TestMethod]
+        public void WithOAuth2_Replaces_Existing_Authorization()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder
+                .WithOAuth2("oldToken")
+                .WithOAuth2("newToken")
+                .Create();
+            var authHeaders = request.Parameters.Where(p => p.Name == "Authorization" && p.Type == ParameterType.HttpHeader).ToList();
+            Assert.AreEqual(1, authHeaders.Count);
+            Assert.AreEqual("Bearer newToken", authHeaders[0].Value);
+        }
+
+        [TestMethod]
+        public void WithOAuth2_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.WithOAuth2("token");
+            Assert.AreSame(builder, result);
+        }
+
+        [TestMethod]
+        public void Authentication_Chaining_With_Other_Methods()
+        {
+            var request = new RestRequest().WithBuilder("api/users/{id}")
+                .AddUrlSegment("id", "123")
+                .WithBearerToken("myToken")
+                .AddQueryParameter("page", 1)
+                .SetMethod(Method.Get)
+                .Create();
+
+            Assert.AreEqual(Method.Get, request.Method);
+            var authHeader = request.Parameters.FirstOrDefault(p => p.Name == "Authorization" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(authHeader);
+            Assert.AreEqual("Bearer myToken", authHeader.Value);
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "id" && p.Type == ParameterType.UrlSegment));
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "page" && p.Type == ParameterType.QueryString));
+        }
+
+        [TestMethod]
+        public void Authentication_Bearer_Replaces_Basic()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder
+                .WithBasicAuth("user", "pass")
+                .WithBearerToken("token")
+                .Create();
+            var authHeaders = request.Parameters.Where(p => p.Name == "Authorization" && p.Type == ParameterType.HttpHeader).ToList();
+            Assert.AreEqual(1, authHeaders.Count);
+            Assert.AreEqual("Bearer token", authHeaders[0].Value);
+        }
+
+        [TestMethod]
+        public void Authentication_Basic_Replaces_Bearer()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder
+                .WithBearerToken("token")
+                .WithBasicAuth("user", "pass")
+                .Create();
+            var authHeaders = request.Parameters.Where(p => p.Name == "Authorization" && p.Type == ParameterType.HttpHeader).ToList();
+            Assert.AreEqual(1, authHeaders.Count);
+            var authValue = authHeaders[0].Value as string;
+            Assert.IsTrue(authValue.StartsWith("Basic "));
         }
     }
 }

@@ -154,6 +154,37 @@ namespace RestSharp.RequestBuilder.Interfaces
         IRequestBuilder SetMethod(Method method);
 
         /// <summary>
+        /// Adds a Bearer token to the Authorization header.
+        /// </summary>
+        /// <param name="token">The bearer token to add.</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder WithBearerToken(string token);
+
+        /// <summary>
+        /// Adds Basic authentication to the Authorization header.
+        /// Credentials are Base64-encoded as "username:password".
+        /// </summary>
+        /// <param name="username">The username for basic authentication.</param>
+        /// <param name="password">The password for basic authentication.</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder WithBasicAuth(string username, string password);
+
+        /// <summary>
+        /// Adds an API key to a specified header.
+        /// </summary>
+        /// <param name="key">The API key to add.</param>
+        /// <param name="headerName">The name of the header. Defaults to "X-API-Key".</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder WithApiKey(string key, string headerName = "X-API-Key");
+
+        /// <summary>
+        /// Adds an OAuth2 access token to the Authorization header as a Bearer token.
+        /// </summary>
+        /// <param name="accessToken">The OAuth2 access token to add.</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder WithOAuth2(string accessToken);
+
+        /// <summary>
         /// Creates the <see cref="RestRequest"/> based on the configured parameters.
         /// </summary>
         /// <returns>A new instance of <see cref="RestRequest"/>.</returns>

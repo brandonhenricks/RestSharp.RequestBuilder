@@ -81,6 +81,52 @@ var request = new RestRequest().WithBuilder("users/{id}/posts")
 - All methods support fluent chaining
 - Null values in bulk operations are skipped
 
+### Authentication
+
+The library provides first-class fluent authentication helpers for common HTTP authentication methods:
+
+#### Bearer Token Authentication
+```csharp
+var request = new RestRequest().WithBuilder("api/me")
+    .WithBearerToken("your-bearer-token")
+    .Create();
+```
+
+#### Basic Authentication
+```csharp
+var request = new RestRequest().WithBuilder("admin")
+    .WithBasicAuth("username", "password")
+    .Create();
+```
+
+The credentials are automatically Base64-encoded as required by the HTTP Basic authentication standard.
+
+#### API Key Authentication
+```csharp
+// Using default header name (X-API-Key)
+var request = new RestRequest().WithBuilder("secure")
+    .WithApiKey("your-api-key")
+    .Create();
+
+// Using custom header name
+var request = new RestRequest().WithBuilder("secure")
+    .WithApiKey("your-api-key", "X-Custom-Api-Key")
+    .Create();
+```
+
+#### OAuth2 Authentication
+```csharp
+var request = new RestRequest().WithBuilder("api/protected")
+    .WithOAuth2("oauth2-access-token")
+    .Create();
+```
+
+**Authentication Features:**
+- All authentication methods chain with other builder methods
+- Setting a new authentication automatically replaces any existing Authorization header
+- All methods validate input and throw `ArgumentNullException` for null or empty values
+- Full XML documentation for IntelliSense support
+
 ## License
 
 RestSharp.RequestBuilder is licensed under the [MIT license](LICENSE).
