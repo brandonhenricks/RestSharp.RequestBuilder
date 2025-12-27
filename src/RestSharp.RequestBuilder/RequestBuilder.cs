@@ -450,6 +450,63 @@ namespace RestSharp.RequestBuilder
         }
 
         /// <inheritdoc/>
+        public IRequestBuilder WithBearerToken(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new ArgumentNullException(nameof(token));
+            }
+
+            return AddHeader("Authorization", $"Bearer {token}");
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder WithBasicAuth(string username, string password)
+        {
+            if (string.IsNullOrEmpty(username))
+            {
+                throw new ArgumentNullException(nameof(username));
+            }
+
+            if (string.IsNullOrEmpty(password))
+            {
+                throw new ArgumentNullException(nameof(password));
+            }
+
+            var credentials = $"{username}:{password}";
+            var encodedCredentials = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(credentials));
+
+            return AddHeader("Authorization", $"Basic {encodedCredentials}");
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder WithApiKey(string key, string headerName = "X-API-Key")
+        {
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new ArgumentNullException(nameof(key));
+            }
+
+            if (string.IsNullOrEmpty(headerName))
+            {
+                throw new ArgumentNullException(nameof(headerName));
+            }
+
+            return AddHeader(headerName, key);
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder WithOAuth2(string accessToken)
+        {
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                throw new ArgumentNullException(nameof(accessToken));
+            }
+
+            return AddHeader("Authorization", $"Bearer {accessToken}");
+        }
+
+        /// <inheritdoc/>
         public RestRequest Create()
         {
             var request = new RestRequest(_resource, _method);
