@@ -127,6 +127,64 @@ var request = new RestRequest().WithBuilder("api/protected")
 - All methods validate input and throw `ArgumentNullException` for null or empty values
 - Full XML documentation for IntelliSense support
 
+### Request Bodies
+
+The library provides convenient shortcut methods for adding request bodies with common content types:
+
+#### JSON Body
+```csharp
+// Add a JSON body to the request
+var request = new RestRequest().WithBuilder("api/users")
+    .SetMethod(Method.Post)
+    .AddJsonBody(new { name = "John Doe", email = "john@example.com" })
+    .Create();
+```
+
+The `AddJsonBody` method automatically sets the request format to `DataFormat.Json` and serializes the body object.
+
+#### XML Body
+```csharp
+// Add an XML body to the request
+var request = new RestRequest().WithBuilder("api/users")
+    .SetMethod(Method.Post)
+    .AddXmlBody(new User { Id = 1, Name = "John Doe" })
+    .Create();
+```
+
+The `AddXmlBody` method automatically sets the request format to `DataFormat.Xml` and serializes the body object.
+
+#### Form URL Encoded Body
+```csharp
+// Add form-urlencoded data (commonly used for OAuth token requests)
+var request = new RestRequest().WithBuilder("oauth/token")
+    .SetMethod(Method.Post)
+    .AddFormUrlEncodedBody(new Dictionary<string, string>
+    {
+        { "grant_type", "password" },
+        { "username", "user@example.com" },
+        { "password", "secretpassword" }
+    })
+    .Create();
+```
+
+The `AddFormUrlEncodedBody` method adds each key-value pair as a form parameter (`GetOrPost` parameter type).
+
+**Body Method Features:**
+- All body methods validate input and throw `ArgumentNullException` for null values
+- Body methods chain with other builder methods for flexible request construction
+- `AddJsonBody` and `AddXmlBody` automatically set the appropriate request format
+- `AddFormUrlEncodedBody` skips null values in the dictionary
+- Setting a new body replaces any previously set body
+- Full XML documentation for IntelliSense support
+
+**Important:** Do not mix `AddJsonBody`/`AddXmlBody` with `AddFormUrlEncodedBody` on the same request builder. These represent mutually exclusive ways of sending data:
+- `AddJsonBody`/`AddXmlBody` set a request body (serialized as JSON or XML)
+- `AddFormUrlEncodedBody` adds form parameters (sent as `application/x-www-form-urlencoded`)
+
+Choose one approach based on your API requirements. Mixing both would create a semantically invalid request.
+
+**Note:** These methods work with RestSharp's serialization pipeline. For JSON, ensure you have configured an appropriate JSON serializer (RestSharp uses `System.Text.Json` by default). For XML, RestSharp uses the built-in .NET XML serializer.
+
 ## License
 
 RestSharp.RequestBuilder is licensed under the [MIT license](LICENSE).

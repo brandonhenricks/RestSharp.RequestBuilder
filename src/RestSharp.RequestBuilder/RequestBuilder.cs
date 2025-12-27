@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using RestSharp.RequestBuilder.Interfaces;
 using RestSharp.RequestBuilder.Models;
 
@@ -170,6 +171,56 @@ namespace RestSharp.RequestBuilder
             _body = body;
 
             _dataFormat = dataFormat;
+
+            return this;
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder AddJsonBody<T>(T body) where T : class
+        {
+            if (body is null)
+            {
+                throw new ArgumentNullException(nameof(body));
+            }
+
+            _body = body;
+            _dataFormat = DataFormat.Json;
+
+            return this;
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder AddXmlBody<T>(T body) where T : class
+        {
+            if (body is null)
+            {
+                throw new ArgumentNullException(nameof(body));
+            }
+
+            _body = body;
+            _dataFormat = DataFormat.Xml;
+
+            return this;
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder AddFormUrlEncodedBody(IDictionary<string, string> data)
+        {
+            if (data is null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            foreach (var kvp in data.Where(kvp => kvp.Value != null))
+            {
+                if (string.IsNullOrEmpty(kvp.Key))
+                {
+                    throw new ArgumentException("Dictionary keys cannot be null or empty.", nameof(data));
+                }
+
+                var parameter = new GetOrPostParameter(kvp.Key, kvp.Value);
+                AddParameter(parameter);
+            }
 
             return this;
         }
