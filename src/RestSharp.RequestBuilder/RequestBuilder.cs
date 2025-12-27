@@ -288,11 +288,15 @@ namespace RestSharp.RequestBuilder
                 throw new ArgumentNullException(nameof(name));
             }
 
-            if (bytes == null || bytes.Length == 0)
+            if (bytes == null)
             {
                 throw new ArgumentNullException(nameof(bytes));
             }
 
+            if (bytes.Length == 0)
+            {
+                throw new ArgumentException("Byte array cannot be empty.", nameof(bytes));
+            }
             if (string.IsNullOrEmpty(fileName))
             {
                 throw new ArgumentNullException(nameof(fileName));
