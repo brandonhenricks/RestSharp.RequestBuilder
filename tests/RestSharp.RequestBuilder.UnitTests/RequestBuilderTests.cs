@@ -1110,6 +1110,538 @@ namespace RestSharp.RequestBuilder.UnitTests
             Assert.IsTrue(authValue.StartsWith("Basic "));
         }
 
+        // --- WithAccept ---
+        [TestMethod]
+        public void WithAccept_Null_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithAccept(null));
+        }
+
+        [TestMethod]
+        public void WithAccept_Empty_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithAccept(""));
+        }
+
+        [TestMethod]
+        public void WithAccept_Adds_Accept_Header()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder.WithAccept("application/json").Create();
+            var acceptHeader = request.Parameters.FirstOrDefault(p => p.Name == "Accept" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(acceptHeader);
+            Assert.AreEqual("application/json", acceptHeader.Value);
+        }
+
+        [TestMethod]
+        public void WithAccept_Replaces_Existing()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder
+                .WithAccept("application/xml")
+                .WithAccept("application/json")
+                .Create();
+            var acceptHeaders = request.Parameters.Where(p => p.Name == "Accept" && p.Type == ParameterType.HttpHeader).ToList();
+            Assert.AreEqual(1, acceptHeaders.Count);
+            Assert.AreEqual("application/json", acceptHeaders[0].Value);
+        }
+
+        [TestMethod]
+        public void WithAccept_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.WithAccept("text/html");
+            Assert.AreSame(builder, result);
+        }
+
+        // --- WithAcceptJson ---
+        [TestMethod]
+        public void WithAcceptJson_Adds_Json_Accept_Header()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder.WithAcceptJson().Create();
+            var acceptHeader = request.Parameters.FirstOrDefault(p => p.Name == "Accept" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(acceptHeader);
+            Assert.AreEqual("application/json", acceptHeader.Value);
+        }
+
+        [TestMethod]
+        public void WithAcceptJson_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.WithAcceptJson();
+            Assert.AreSame(builder, result);
+        }
+
+        // --- WithAcceptXml ---
+        [TestMethod]
+        public void WithAcceptXml_Adds_Xml_Accept_Header()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder.WithAcceptXml().Create();
+            var acceptHeader = request.Parameters.FirstOrDefault(p => p.Name == "Accept" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(acceptHeader);
+            Assert.AreEqual("application/xml", acceptHeader.Value);
+        }
+
+        [TestMethod]
+        public void WithAcceptXml_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.WithAcceptXml();
+            Assert.AreSame(builder, result);
+        }
+
+        // --- WithContentType ---
+        [TestMethod]
+        public void WithContentType_Null_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithContentType(null));
+        }
+
+        [TestMethod]
+        public void WithContentType_Empty_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithContentType(""));
+        }
+
+        [TestMethod]
+        public void WithContentType_Adds_ContentType_Header()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder.WithContentType("application/json").Create();
+            var contentTypeHeader = request.Parameters.FirstOrDefault(p => p.Name == "Content-Type" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(contentTypeHeader);
+            Assert.AreEqual("application/json", contentTypeHeader.Value);
+        }
+
+        [TestMethod]
+        public void WithContentType_Replaces_Existing()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder
+                .WithContentType("application/xml")
+                .WithContentType("application/json")
+                .Create();
+            var contentTypeHeaders = request.Parameters.Where(p => p.Name == "Content-Type" && p.Type == ParameterType.HttpHeader).ToList();
+            Assert.AreEqual(1, contentTypeHeaders.Count);
+            Assert.AreEqual("application/json", contentTypeHeaders[0].Value);
+        }
+
+        [TestMethod]
+        public void WithContentType_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.WithContentType("text/plain");
+            Assert.AreSame(builder, result);
+        }
+
+        // --- WithUserAgent ---
+        [TestMethod]
+        public void WithUserAgent_Null_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithUserAgent(null));
+        }
+
+        [TestMethod]
+        public void WithUserAgent_Empty_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithUserAgent(""));
+        }
+
+        [TestMethod]
+        public void WithUserAgent_Adds_UserAgent_Header()
+        {
+            var builder = new RequestBuilder("resource");
+            var userAgent = "MyCustomClient/1.2.3";
+            var request = builder.WithUserAgent(userAgent).Create();
+            var userAgentHeader = request.Parameters.FirstOrDefault(p => p.Name == "User-Agent" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(userAgentHeader);
+            Assert.AreEqual(userAgent, userAgentHeader.Value);
+        }
+
+        [TestMethod]
+        public void WithUserAgent_Replaces_Existing()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder
+                .WithUserAgent("OldClient/1.0.0")
+                .WithUserAgent("NewClient/2.0.0")
+                .Create();
+            var userAgentHeaders = request.Parameters.Where(p => p.Name == "User-Agent" && p.Type == ParameterType.HttpHeader).ToList();
+            Assert.AreEqual(1, userAgentHeaders.Count);
+            Assert.AreEqual("NewClient/2.0.0", userAgentHeaders[0].Value);
+        }
+
+        [TestMethod]
+        public void WithUserAgent_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.WithUserAgent("MyApp/1.0");
+            Assert.AreSame(builder, result);
+        }
+
+        // --- WithAuthorization ---
+        [TestMethod]
+        public void WithAuthorization_Null_Scheme_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithAuthorization(null, "value"));
+        }
+
+        [TestMethod]
+        public void WithAuthorization_Empty_Scheme_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithAuthorization("", "value"));
+        }
+
+        [TestMethod]
+        public void WithAuthorization_Null_Value_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithAuthorization("Bearer", null));
+        }
+
+        [TestMethod]
+        public void WithAuthorization_Empty_Value_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithAuthorization("Bearer", ""));
+        }
+
+        [TestMethod]
+        public void WithAuthorization_Adds_Authorization_Header()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder.WithAuthorization("Bearer", "token123").Create();
+            var authHeader = request.Parameters.FirstOrDefault(p => p.Name == "Authorization" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(authHeader);
+            Assert.AreEqual("Bearer token123", authHeader.Value);
+        }
+
+        [TestMethod]
+        public void WithAuthorization_Custom_Scheme()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder.WithAuthorization("Digest", "realm=\"test\"").Create();
+            var authHeader = request.Parameters.FirstOrDefault(p => p.Name == "Authorization" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(authHeader);
+            Assert.AreEqual("Digest realm=\"test\"", authHeader.Value);
+        }
+
+        [TestMethod]
+        public void WithAuthorization_Replaces_Existing()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder
+                .WithAuthorization("Bearer", "oldToken")
+                .WithAuthorization("Bearer", "newToken")
+                .Create();
+            var authHeaders = request.Parameters.Where(p => p.Name == "Authorization" && p.Type == ParameterType.HttpHeader).ToList();
+            Assert.AreEqual(1, authHeaders.Count);
+            Assert.AreEqual("Bearer newToken", authHeaders[0].Value);
+        }
+
+        [TestMethod]
+        public void WithAuthorization_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.WithAuthorization("Bearer", "token");
+            Assert.AreSame(builder, result);
+        }
+
+        // --- WithIfMatch ---
+        [TestMethod]
+        public void WithIfMatch_Null_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithIfMatch(null));
+        }
+
+        [TestMethod]
+        public void WithIfMatch_Empty_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithIfMatch(""));
+        }
+
+        [TestMethod]
+        public void WithIfMatch_Adds_IfMatch_Header()
+        {
+            var builder = new RequestBuilder("resource");
+            var etag = "\"abc1234\"";
+            var request = builder.WithIfMatch(etag).Create();
+            var ifMatchHeader = request.Parameters.FirstOrDefault(p => p.Name == "If-Match" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(ifMatchHeader);
+            Assert.AreEqual(etag, ifMatchHeader.Value);
+        }
+
+        [TestMethod]
+        public void WithIfMatch_Replaces_Existing()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder
+                .WithIfMatch("\"old\"")
+                .WithIfMatch("\"new\"")
+                .Create();
+            var ifMatchHeaders = request.Parameters.Where(p => p.Name == "If-Match" && p.Type == ParameterType.HttpHeader).ToList();
+            Assert.AreEqual(1, ifMatchHeaders.Count);
+            Assert.AreEqual("\"new\"", ifMatchHeaders[0].Value);
+        }
+
+        [TestMethod]
+        public void WithIfMatch_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.WithIfMatch("\"etag\"");
+            Assert.AreSame(builder, result);
+        }
+
+        // --- WithIfNoneMatch ---
+        [TestMethod]
+        public void WithIfNoneMatch_Null_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithIfNoneMatch(null));
+        }
+
+        [TestMethod]
+        public void WithIfNoneMatch_Empty_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithIfNoneMatch(""));
+        }
+
+        [TestMethod]
+        public void WithIfNoneMatch_Adds_IfNoneMatch_Header()
+        {
+            var builder = new RequestBuilder("resource");
+            var etag = "\"abc1234\"";
+            var request = builder.WithIfNoneMatch(etag).Create();
+            var ifNoneMatchHeader = request.Parameters.FirstOrDefault(p => p.Name == "If-None-Match" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(ifNoneMatchHeader);
+            Assert.AreEqual(etag, ifNoneMatchHeader.Value);
+        }
+
+        [TestMethod]
+        public void WithIfNoneMatch_Replaces_Existing()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder
+                .WithIfNoneMatch("\"old\"")
+                .WithIfNoneMatch("\"new\"")
+                .Create();
+            var ifNoneMatchHeaders = request.Parameters.Where(p => p.Name == "If-None-Match" && p.Type == ParameterType.HttpHeader).ToList();
+            Assert.AreEqual(1, ifNoneMatchHeaders.Count);
+            Assert.AreEqual("\"new\"", ifNoneMatchHeaders[0].Value);
+        }
+
+        [TestMethod]
+        public void WithIfNoneMatch_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.WithIfNoneMatch("\"etag\"");
+            Assert.AreSame(builder, result);
+        }
+
+        // --- WithReferer ---
+        [TestMethod]
+        public void WithReferer_Null_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithReferer(null));
+        }
+
+        [TestMethod]
+        public void WithReferer_Empty_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithReferer(""));
+        }
+
+        [TestMethod]
+        public void WithReferer_Adds_Referer_Header()
+        {
+            var builder = new RequestBuilder("resource");
+            var referer = "https://example.com/page";
+            var request = builder.WithReferer(referer).Create();
+            var refererHeader = request.Parameters.FirstOrDefault(p => p.Name == "Referer" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(refererHeader);
+            Assert.AreEqual(referer, refererHeader.Value);
+        }
+
+        [TestMethod]
+        public void WithReferer_Replaces_Existing()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder
+                .WithReferer("https://old.com")
+                .WithReferer("https://new.com")
+                .Create();
+            var refererHeaders = request.Parameters.Where(p => p.Name == "Referer" && p.Type == ParameterType.HttpHeader).ToList();
+            Assert.AreEqual(1, refererHeaders.Count);
+            Assert.AreEqual("https://new.com", refererHeaders[0].Value);
+        }
+
+        [TestMethod]
+        public void WithReferer_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.WithReferer("https://example.com");
+            Assert.AreSame(builder, result);
+        }
+
+        // --- WithOrigin ---
+        [TestMethod]
+        public void WithOrigin_Null_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithOrigin(null));
+        }
+
+        [TestMethod]
+        public void WithOrigin_Empty_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.WithOrigin(""));
+        }
+
+        [TestMethod]
+        public void WithOrigin_Adds_Origin_Header()
+        {
+            var builder = new RequestBuilder("resource");
+            var origin = "https://example.com";
+            var request = builder.WithOrigin(origin).Create();
+            var originHeader = request.Parameters.FirstOrDefault(p => p.Name == "Origin" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(originHeader);
+            Assert.AreEqual(origin, originHeader.Value);
+        }
+
+        [TestMethod]
+        public void WithOrigin_Replaces_Existing()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder
+                .WithOrigin("https://old.com")
+                .WithOrigin("https://new.com")
+                .Create();
+            var originHeaders = request.Parameters.Where(p => p.Name == "Origin" && p.Type == ParameterType.HttpHeader).ToList();
+            Assert.AreEqual(1, originHeaders.Count);
+            Assert.AreEqual("https://new.com", originHeaders[0].Value);
+        }
+
+        [TestMethod]
+        public void WithOrigin_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.WithOrigin("https://example.com");
+            Assert.AreSame(builder, result);
+        }
+
+        // --- Header Methods Integration Tests ---
+        [TestMethod]
+        public void HeaderMethods_Chaining_All_Together()
+        {
+            var request = new RestRequest().WithBuilder("api/items")
+                .WithAccept("application/json")
+                .WithContentType("application/json")
+                .WithUserAgent("MyCustomClient/1.2.3")
+                .WithBearerToken("token123")
+                .WithIfNoneMatch("\"abc1234\"")
+                .WithReferer("https://example.com/page")
+                .WithOrigin("https://example.com")
+                .Create();
+
+            var headers = request.Parameters.Where(p => p.Type == ParameterType.HttpHeader).ToList();
+            Assert.IsNotNull(headers.FirstOrDefault(p => p.Name == "Accept" && p.Value.ToString() == "application/json"));
+            Assert.IsNotNull(headers.FirstOrDefault(p => p.Name == "Content-Type" && p.Value.ToString() == "application/json"));
+            Assert.IsNotNull(headers.FirstOrDefault(p => p.Name == "User-Agent" && p.Value.ToString() == "MyCustomClient/1.2.3"));
+            Assert.IsNotNull(headers.FirstOrDefault(p => p.Name == "Authorization" && p.Value.ToString() == "Bearer token123"));
+            Assert.IsNotNull(headers.FirstOrDefault(p => p.Name == "If-None-Match" && p.Value.ToString() == "\"abc1234\""));
+            Assert.IsNotNull(headers.FirstOrDefault(p => p.Name == "Referer" && p.Value.ToString() == "https://example.com/page"));
+            Assert.IsNotNull(headers.FirstOrDefault(p => p.Name == "Origin" && p.Value.ToString() == "https://example.com"));
+        }
+
+        [TestMethod]
+        public void HeaderMethods_AcceptJson_And_AcceptXml()
+        {
+            var jsonRequest = new RestRequest().WithBuilder("api/json")
+                .WithAcceptJson()
+                .Create();
+            var jsonHeader = jsonRequest.Parameters.FirstOrDefault(p => p.Name == "Accept" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(jsonHeader);
+            Assert.AreEqual("application/json", jsonHeader.Value);
+
+            var xmlRequest = new RestRequest().WithBuilder("api/xml")
+                .WithAcceptXml()
+                .Create();
+            var xmlHeader = xmlRequest.Parameters.FirstOrDefault(p => p.Name == "Accept" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(xmlHeader);
+            Assert.AreEqual("application/xml", xmlHeader.Value);
+        }
+
+        [TestMethod]
+        public void HeaderMethods_WithAuthorization_Various_Schemes()
+        {
+            // Test Bearer scheme
+            var bearerRequest = new RestRequest().WithBuilder("resource")
+                .WithAuthorization("Bearer", "mytoken123")
+                .Create();
+            var bearerAuth = bearerRequest.Parameters.FirstOrDefault(p => p.Name == "Authorization" && p.Type == ParameterType.HttpHeader);
+            Assert.AreEqual("Bearer mytoken123", bearerAuth?.Value);
+
+            // Test Basic scheme (using WithAuthorization directly, not WithBasicAuth)
+            var basicRequest = new RestRequest().WithBuilder("resource")
+                .WithAuthorization("Basic", "encodedcredentials")
+                .Create();
+            var basicAuth = basicRequest.Parameters.FirstOrDefault(p => p.Name == "Authorization" && p.Type == ParameterType.HttpHeader);
+            Assert.AreEqual("Basic encodedcredentials", basicAuth?.Value);
+
+            // Test custom scheme
+            var customRequest = new RestRequest().WithBuilder("resource")
+                .WithAuthorization("Digest", "realm=\"test\"")
+                .Create();
+            var customAuth = customRequest.Parameters.FirstOrDefault(p => p.Name == "Authorization" && p.Type == ParameterType.HttpHeader);
+            Assert.AreEqual("Digest realm=\"test\"", customAuth?.Value);
+        }
+
+        [TestMethod]
+        public void HeaderMethods_Conditional_Requests()
+        {
+            var request = new RestRequest().WithBuilder("api/resource/{id}")
+                .AddUrlSegment("id", "123")
+                .WithIfMatch("\"v1\"")
+                .SetMethod(Method.Put)
+                .Create();
+
+            var ifMatchHeader = request.Parameters.FirstOrDefault(p => p.Name == "If-Match" && p.Type == ParameterType.HttpHeader);
+            Assert.IsNotNull(ifMatchHeader);
+            Assert.AreEqual("\"v1\"", ifMatchHeader.Value);
+        }
+
+        [TestMethod]
+        public void HeaderMethods_With_Query_Parameters()
+        {
+            var request = new RestRequest().WithBuilder("api/items")
+                .WithAcceptJson()
+                .WithUserAgent("TestClient/1.0")
+                .AddQueryParameter("page", 1)
+                .AddQueryParameter("limit", 50)
+                .Create();
+
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "Accept"));
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "User-Agent"));
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "page"));
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "limit"));
+        }
+
         // --- AddJsonBody ---
         [TestMethod]
         public void AddJsonBody_Null_Throws()
