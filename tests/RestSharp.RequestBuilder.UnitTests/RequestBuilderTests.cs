@@ -1423,6 +1423,258 @@ namespace RestSharp.RequestBuilder.UnitTests
             Assert.AreEqual(3, request.Parameters.Count);
         }
 
+        // --- AddFiles (Multiple File Upload) ---
+        [TestMethod]
+        public void AddFiles_Multiple_Adds_All_Files()
+        {
+            // Create temporary test files
+            var tempPath1 = System.IO.Path.GetTempFileName();
+            var tempPath2 = System.IO.Path.GetTempFileName();
+
+            try
+            {
+                System.IO.File.WriteAllText(tempPath1, "test content 1");
+                System.IO.File.WriteAllText(tempPath2, "test content 2");
+
+                var builder = new RequestBuilder("resource");
+                var request = builder
+                    .AddFiles(
+                        ("file1", tempPath1, "text/plain"),
+                        ("file2", tempPath2, "application/pdf")
+                    )
+                    .Create();
+
+                Assert.AreEqual(2, request.Files.Count);
+                Assert.IsNotNull(request.Files.FirstOrDefault(f => f.Name == "file1"));
+                Assert.IsNotNull(request.Files.FirstOrDefault(f => f.Name == "file2"));
+            }
+            finally
+            {
+                if (System.IO.File.Exists(tempPath1)) System.IO.File.Delete(tempPath1);
+                if (System.IO.File.Exists(tempPath2)) System.IO.File.Delete(tempPath2);
+            }
+        }
+
+        [TestMethod]
+        public void AddFiles_Null_Returns_Builder()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.AddFiles(null);
+            Assert.AreSame(builder, result);
+        }
+
+        [TestMethod]
+        public void AddFiles_Empty_Returns_Builder()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.AddFiles();
+            Assert.AreSame(builder, result);
+        }
+
+        [TestMethod]
+        public void AddFile_Called_Multiple_Times_Adds_All()
+        {
+            var tempPath1 = System.IO.Path.GetTempFileName();
+            var tempPath2 = System.IO.Path.GetTempFileName();
+
+            try
+            {
+                System.IO.File.WriteAllText(tempPath1, "test 1");
+                System.IO.File.WriteAllText(tempPath2, "test 2");
+
+                var builder = new RequestBuilder("resource");
+                builder.AddFile("file1", tempPath1);
+                builder.AddFile("file2", tempPath2);
+                var request = builder.Create();
+
+                Assert.AreEqual(2, request.Files.Count);
+                Assert.IsNotNull(request.Files.FirstOrDefault(f => f.Name == "file1"));
+                Assert.IsNotNull(request.Files.FirstOrDefault(f => f.Name == "file2"));
+            }
+            finally
+            {
+                if (System.IO.File.Exists(tempPath1)) System.IO.File.Delete(tempPath1);
+                if (System.IO.File.Exists(tempPath2)) System.IO.File.Delete(tempPath2);
+            }
+        }
+
+        // --- AddFileBytes ---
+        [TestMethod]
+        public void AddFileBytes_Null_Name_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            var bytes = new byte[] { 1, 2, 3 };
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                builder.AddFileBytes(null, bytes, "filename.txt"));
+        }
+
+        [TestMethod]
+        public void AddFileBytes_Empty_Name_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            var bytes = new byte[] { 1, 2, 3 };
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                builder.AddFileBytes("", bytes, "filename.txt"));
+        }
+
+        [TestMethod]
+        public void AddFileBytes_Null_Bytes_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                builder.AddFileBytes("file", null, "filename.txt"));
+        }
+
+        [TestMethod]
+        public void AddFileBytes_Empty_Bytes_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentException>(() =>
+                builder.AddFileBytes("file", new byte[0], "filename.txt"));
+        }
+
+        [TestMethod]
+        public void AddFileBytes_Null_FileName_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            var bytes = new byte[] { 1, 2, 3 };
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                builder.AddFileBytes("file", bytes, null));
+        }
+
+        [TestMethod]
+        public void AddFileBytes_Empty_FileName_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            var bytes = new byte[] { 1, 2, 3 };
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                builder.AddFileBytes("file", bytes, ""));
+        }
+
+        [TestMethod]
+        public void AddFileBytes_Valid_Adds_File()
+        {
+            var builder = new RequestBuilder("resource");
+            var bytes = new byte[] { 1, 2, 3, 4, 5 };
+            var request = builder
+                .AddFileBytes("data", bytes, "data.bin", "application/octet-stream")
+                .Create();
+
+            Assert.AreEqual(1, request.Files.Count);
+            var file = request.Files.FirstOrDefault(f => f.Name == "data");
+            Assert.IsNotNull(file);
+            Assert.AreEqual("data.bin", file.FileName);
+        }
+
+        [TestMethod]
+        public void AddFileBytes_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var bytes = new byte[] { 1, 2, 3 };
+            var result = builder.AddFileBytes("file", bytes, "file.bin");
+            Assert.AreSame(builder, result);
+        }
+
+        // --- AddFileStream ---
+        [TestMethod]
+        public void AddFileStream_Null_Name_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            using var stream = new System.IO.MemoryStream(new byte[] { 1, 2, 3 });
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                builder.AddFileStream(null, stream, "filename.txt"));
+        }
+
+        [TestMethod]
+        public void AddFileStream_Empty_Name_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            using var stream = new System.IO.MemoryStream(new byte[] { 1, 2, 3 });
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                builder.AddFileStream("", stream, "filename.txt"));
+        }
+
+        [TestMethod]
+        public void AddFileStream_Null_Stream_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                builder.AddFileStream("file", null, "filename.txt"));
+        }
+
+        [TestMethod]
+        public void AddFileStream_Null_FileName_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            using var stream = new System.IO.MemoryStream(new byte[] { 1, 2, 3 });
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                builder.AddFileStream("file", stream, null));
+        }
+
+        [TestMethod]
+        public void AddFileStream_Empty_FileName_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            using var stream = new System.IO.MemoryStream(new byte[] { 1, 2, 3 });
+            Assert.ThrowsException<ArgumentNullException>(() =>
+                builder.AddFileStream("file", stream, ""));
+        }
+
+        [TestMethod]
+        public void AddFileStream_Valid_Stream_Adds_File()
+        {
+            var stream = new System.IO.MemoryStream(new byte[] { 1, 2, 3 });
+            var builder = new RequestBuilder("resource");
+            var request = builder
+                .AddFileStream("data", stream, "data.bin", "application/octet-stream")
+                .Create();
+
+            Assert.AreEqual(1, request.Files.Count);
+            var file = request.Files.FirstOrDefault(f => f.Name == "data");
+            Assert.IsNotNull(file);
+            Assert.AreEqual("data.bin", file.FileName);
+        }
+
+        [TestMethod]
+        public void AddFileStream_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            using var stream = new System.IO.MemoryStream(new byte[] { 1, 2, 3 });
+            var result = builder.AddFileStream("file", stream, "file.bin");
+            Assert.AreSame(builder, result);
+        }
+
+        // --- Mixed File Upload Sources ---
+        [TestMethod]
+        public void Mixed_File_Sources_All_Added()
+        {
+            var tempPath = System.IO.Path.GetTempFileName();
+
+            try
+            {
+                System.IO.File.WriteAllText(tempPath, "disk file");
+
+                var bytes = new byte[] { 1, 2, 3, 4, 5 };
+                var stream = new System.IO.MemoryStream(new byte[] { 6, 7, 8, 9 });
+
+                var builder = new RequestBuilder("resource");
+                var request = builder
+                    .AddFile("diskFile", tempPath, "text/plain")
+                    .AddFileBytes("bytesFile", bytes, "bytes.bin", "application/octet-stream")
+                    .AddFileStream("streamFile", stream, "stream.bin", "application/octet-stream")
+                    .Create();
+
+                Assert.AreEqual(3, request.Files.Count);
+                Assert.IsNotNull(request.Files.FirstOrDefault(f => f.Name == "diskFile"));
+                Assert.IsNotNull(request.Files.FirstOrDefault(f => f.Name == "bytesFile"));
+                Assert.IsNotNull(request.Files.FirstOrDefault(f => f.Name == "streamFile"));
+            }
+            finally
+            {
+                if (System.IO.File.Exists(tempPath)) System.IO.File.Delete(tempPath);
+            }
+        }
+
         // Helper class for testing
         private class TestUser
         {
