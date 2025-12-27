@@ -1655,7 +1655,7 @@ namespace RestSharp.RequestBuilder.UnitTests
                 System.IO.File.WriteAllText(tempPath, "disk file");
 
                 var bytes = new byte[] { 1, 2, 3, 4, 5 };
-                using var stream = new System.IO.MemoryStream(new byte[] { 6, 7, 8, 9 });
+                var stream = new System.IO.MemoryStream(new byte[] { 6, 7, 8, 9 });
 
                 var builder = new RequestBuilder("resource");
                 var request = builder
