@@ -90,6 +90,33 @@ namespace RestSharp.RequestBuilder.Interfaces
         IRequestBuilder AddFile(string name, string path, string contentType = null);
 
         /// <summary>
+        /// Adds multiple files to the request.
+        /// </summary>
+        /// <param name="files">Array of tuples containing (name, path, contentType).</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder AddFiles(params (string name, string path, string contentType)[] files);
+
+        /// <summary>
+        /// Adds a file from a byte array to the request.
+        /// </summary>
+        /// <param name="name">The name of the file parameter.</param>
+        /// <param name="bytes">The file content as byte array.</param>
+        /// <param name="fileName">The file name to use.</param>
+        /// <param name="contentType">The content type of the file. Optional.</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder AddFileBytes(string name, byte[] bytes, string fileName, string contentType = null);
+
+        /// <summary>
+        /// Adds a file from a stream to the request.
+        /// </summary>
+        /// <param name="name">The name of the file parameter.</param>
+        /// <param name="stream">The stream containing file data.</param>
+        /// <param name="fileName">The file name to use.</param>
+        /// <param name="contentType">The content type of the file. Optional.</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder AddFileStream(string name, System.IO.Stream stream, string fileName, string contentType = null);
+
+        /// <summary>
         /// Adds a parameter to the request.
         /// </summary>
         /// <param name="parameter">The parameter to add.</param>

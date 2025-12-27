@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using RestSharp.RequestBuilder.Interfaces;
 using RestSharp.RequestBuilder.Models;
@@ -14,18 +15,28 @@ namespace RestSharp.RequestBuilder
     {
         #region Private Properties
 
+        /// <summary>
+        /// Represents a file attachment with various source types.
+        /// </summary>
+        private sealed class FileAttachment
+        {
+            public string Name { get; set; }
+            public string Path { get; set; }
+            public string ContentType { get; set; }
+            public byte[] Bytes { get; set; }
+            public Stream Stream { get; set; }
+            public string FileName { get; set; }
+        }
+
         private readonly string _resource;
         private readonly Dictionary<string, string> _headers;
         private readonly HashSet<CookieValue> _cookieValues;
         private readonly List<Parameter> _parameters;
+        private readonly List<FileAttachment> _files;
         private DataFormat _dataFormat;
         private Method _method;
         private object _body;
         private TimeSpan? _timeOut;
-
-        private string _fileName;
-        private string _filePath;
-        private string _fileType;
 
         #endregion Private Properties
 
@@ -52,6 +63,7 @@ namespace RestSharp.RequestBuilder
             _resource = resource;
             _headers = new Dictionary<string, string>();
             _parameters = new List<Parameter>();
+            _files = new List<FileAttachment>();
             _method = Method.Get;
             _dataFormat = DataFormat.Json;
             _cookieValues = new HashSet<CookieValue>(new CookieValueComparer());
@@ -73,6 +85,7 @@ namespace RestSharp.RequestBuilder
             _resource = resource.ToString();
             _headers = new Dictionary<string, string>();
             _parameters = new List<Parameter>();
+            _files = new List<FileAttachment>();
             _method = Method.Get;
             _dataFormat = DataFormat.Json;
             _cookieValues = new HashSet<CookieValue>(new CookieValueComparer());
@@ -95,6 +108,7 @@ namespace RestSharp.RequestBuilder
             _resource = resource.ToString();
             _headers = new Dictionary<string, string>();
             _parameters = new List<Parameter>();
+            _files = new List<FileAttachment>();
             _method = method;
             _dataFormat = DataFormat.Json;
             _cookieValues = new HashSet<CookieValue>(new CookieValueComparer());
@@ -116,6 +130,7 @@ namespace RestSharp.RequestBuilder
             _resource = resource;
             _headers = new Dictionary<string, string>();
             _parameters = new List<Parameter>();
+            _files = new List<FileAttachment>();
             _method = method;
             _dataFormat = DataFormat.Json;
             _cookieValues = new HashSet<CookieValue>(new CookieValueComparer());
@@ -138,6 +153,7 @@ namespace RestSharp.RequestBuilder
             _resource = resource;
             _headers = new Dictionary<string, string>();
             _parameters = new List<Parameter>();
+            _files = new List<FileAttachment>();
             _method = method;
             _dataFormat = format;
             _cookieValues = new HashSet<CookieValue>(new CookieValueComparer());
@@ -238,9 +254,86 @@ namespace RestSharp.RequestBuilder
                 throw new ArgumentNullException(nameof(path));
             }
 
-            _fileName = name;
-            _filePath = path;
-            _fileType = contentType;
+            _files.Add(new FileAttachment
+            {
+                Name = name,
+                Path = path,
+                ContentType = contentType
+            });
+
+            return this;
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder AddFiles(params (string name, string path, string contentType)[] files)
+        {
+            if (files == null || files.Length == 0)
+            {
+                return this;
+            }
+
+            foreach (var (name, path, contentType) in files)
+            {
+                AddFile(name, path, contentType);
+            }
+
+            return this;
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder AddFileBytes(string name, byte[] bytes, string fileName, string contentType = null)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            if (bytes == null || bytes.Length == 0)
+            {
+                throw new ArgumentNullException(nameof(bytes));
+            }
+
+            if (string.IsNullOrEmpty(fileName))
+            {
+                throw new ArgumentNullException(nameof(fileName));
+            }
+
+            _files.Add(new FileAttachment
+            {
+                Name = name,
+                Bytes = bytes,
+                FileName = fileName,
+                ContentType = contentType
+            });
+
+            return this;
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder AddFileStream(string name, Stream stream, string fileName, string contentType = null)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            if (stream == null)
+            {
+                throw new ArgumentNullException(nameof(stream));
+            }
+
+            if (string.IsNullOrEmpty(fileName))
+            {
+                throw new ArgumentNullException(nameof(fileName));
+            }
+
+            _files.Add(new FileAttachment
+            {
+                Name = name,
+                Stream = stream,
+                FileName = fileName,
+                ContentType = contentType
+            });
 
             return this;
         }
@@ -584,9 +677,21 @@ namespace RestSharp.RequestBuilder
                 request.AddCookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain);
             }
 
-            if (!string.IsNullOrEmpty(_fileName) && !string.IsNullOrEmpty(_filePath))
+            // Add all files to the request
+            foreach (var file in _files)
             {
-                request.AddFile(_fileName, _filePath, _fileType);
+                if (!string.IsNullOrEmpty(file.Path))
+                {
+                    request.AddFile(file.Name, file.Path, file.ContentType);
+                }
+                else if (file.Bytes != null && file.Bytes.Length > 0)
+                {
+                    request.AddFile(file.Name, file.Bytes, file.FileName, file.ContentType);
+                }
+                else if (file.Stream != null)
+                {
+                    request.AddFile(file.Name, () => file.Stream, file.FileName, file.ContentType);
+                }
             }
 
             if (_timeOut != null)
