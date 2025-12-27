@@ -339,6 +339,60 @@ namespace RestSharp.RequestBuilder
         }
 
         /// <inheritdoc/>
+        public IRequestBuilder AddQueryParameter(string name, object value)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            if (value is null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
+            var stringValue = Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture);
+            var parameter = new QueryParameter(name, stringValue);
+            return AddParameter(parameter);
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder AddQueryParameters(IDictionary<string, object> parameters)
+        {
+            if (parameters == null || parameters.Count == 0)
+                return this;
+
+            foreach (var kvp in parameters)
+            {
+                if (kvp.Value is null)
+                    continue;
+
+                var stringValue = Convert.ToString(kvp.Value, System.Globalization.CultureInfo.InvariantCulture);
+                var parameter = new QueryParameter(kvp.Key, stringValue);
+                AddParameter(parameter);
+            }
+
+            return this;
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder AddUrlSegment(string name, string value)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            if (value is null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
+            var parameter = new UrlSegmentParameter(name, value);
+            return AddParameter(parameter);
+        }
+
+        /// <inheritdoc/>
         public IRequestBuilder RemoveHeader(string name)
         {
             if (string.IsNullOrEmpty(name))

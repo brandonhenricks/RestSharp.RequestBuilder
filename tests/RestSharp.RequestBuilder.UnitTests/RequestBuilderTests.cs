@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RestSharp;
+using RestSharp.RequestBuilder.Extensions;
 using RestSharp.RequestBuilder.Interfaces;
 
 namespace RestSharp.RequestBuilder.UnitTests
@@ -508,6 +511,319 @@ namespace RestSharp.RequestBuilder.UnitTests
             builder.RemoveParameter(param);
             var request = builder.Create();
             Assert.IsFalse(request.Parameters.Any(p => p.Name == "p"));
+        }
+
+        // --- AddQueryParameter ---
+        [TestMethod]
+        public void AddQueryParameter_Null_Name_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.AddQueryParameter(null, "value"));
+        }
+
+        [TestMethod]
+        public void AddQueryParameter_Empty_Name_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.AddQueryParameter("", "value"));
+        }
+
+        [TestMethod]
+        public void AddQueryParameter_Null_Value_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.AddQueryParameter("name", null));
+        }
+
+        [TestMethod]
+        public void AddQueryParameter_Adds_Query_Parameter()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder.AddQueryParameter("page", 1).Create();
+            var param = request.Parameters.FirstOrDefault(p => p.Name == "page");
+            Assert.IsNotNull(param);
+            Assert.AreEqual("1", param.Value);
+            Assert.AreEqual(ParameterType.QueryString, param.Type);
+        }
+
+        [TestMethod]
+        public void AddQueryParameter_String_Value()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder.AddQueryParameter("name", "test").Create();
+            var param = request.Parameters.FirstOrDefault(p => p.Name == "name");
+            Assert.IsNotNull(param);
+            Assert.AreEqual("test", param.Value);
+        }
+
+        [TestMethod]
+        public void AddQueryParameter_Int_Value()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder.AddQueryParameter("count", 42).Create();
+            var param = request.Parameters.FirstOrDefault(p => p.Name == "count");
+            Assert.IsNotNull(param);
+            Assert.AreEqual("42", param.Value);
+        }
+
+        [TestMethod]
+        public void AddQueryParameter_Decimal_Value_Uses_InvariantCulture()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder.AddQueryParameter("price", 19.99m).Create();
+            var param = request.Parameters.FirstOrDefault(p => p.Name == "price");
+            Assert.IsNotNull(param);
+            Assert.AreEqual("19.99", param.Value);
+        }
+
+        [TestMethod]
+        public void AddQueryParameter_Bool_Value()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder.AddQueryParameter("active", true).Create();
+            var param = request.Parameters.FirstOrDefault(p => p.Name == "active");
+            Assert.IsNotNull(param);
+            Assert.AreEqual("True", param.Value);
+        }
+
+        [TestMethod]
+        public void AddQueryParameter_Replaces_Existing()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder
+                .AddQueryParameter("page", 1)
+                .AddQueryParameter("page", 2)
+                .Create();
+            var matchingParams = request.Parameters.Where(p => p.Name == "page").ToList();
+            Assert.AreEqual(1, matchingParams.Count);
+            Assert.AreEqual("2", matchingParams[0].Value);
+        }
+
+        [TestMethod]
+        public void AddQueryParameter_Case_Insensitive_Replacement()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder
+                .AddQueryParameter("Page", 1)
+                .AddQueryParameter("page", 2)
+                .Create();
+            var matchingParams = request.Parameters.Where(p =>
+                string.Equals(p.Name, "page", StringComparison.InvariantCultureIgnoreCase)).ToList();
+            Assert.AreEqual(1, matchingParams.Count);
+            Assert.AreEqual("2", matchingParams[0].Value);
+        }
+
+        [TestMethod]
+        public void AddQueryParameter_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.AddQueryParameter("test", "value");
+            Assert.AreSame(builder, result);
+        }
+
+        // --- AddQueryParameters ---
+        [TestMethod]
+        public void AddQueryParameters_Null_Returns_Builder()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.AddQueryParameters(null);
+            Assert.AreSame(builder, result);
+        }
+
+        [TestMethod]
+        public void AddQueryParameters_Empty_Returns_Builder()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.AddQueryParameters(new Dictionary<string, object>());
+            Assert.AreSame(builder, result);
+        }
+
+        [TestMethod]
+        public void AddQueryParameters_Adds_Multiple_Parameters()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder.AddQueryParameters(new Dictionary<string, object>
+            {
+                { "page", 1 },
+                { "limit", 50 },
+                { "sort", "desc" }
+            }).Create();
+            Assert.AreEqual(3, request.Parameters.Count);
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "page"));
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "limit"));
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "sort"));
+        }
+
+        [TestMethod]
+        public void AddQueryParameters_Values_Converted_To_String()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder.AddQueryParameters(new Dictionary<string, object>
+            {
+                { "page", 1 },
+                { "active", true },
+                { "price", 29.99m }
+            }).Create();
+            Assert.AreEqual("1", request.Parameters.FirstOrDefault(p => p.Name == "page")?.Value);
+            Assert.AreEqual("True", request.Parameters.FirstOrDefault(p => p.Name == "active")?.Value);
+            Assert.AreEqual("29.99", request.Parameters.FirstOrDefault(p => p.Name == "price")?.Value);
+        }
+
+        [TestMethod]
+        public void AddQueryParameters_Skips_Null_Values()
+        {
+            var builder = new RequestBuilder("resource");
+            var request = builder.AddQueryParameters(new Dictionary<string, object>
+            {
+                { "page", 1 },
+                { "empty", null },
+                { "sort", "asc" }
+            }).Create();
+            Assert.AreEqual(2, request.Parameters.Count);
+            Assert.IsNull(request.Parameters.FirstOrDefault(p => p.Name == "empty"));
+        }
+
+        [TestMethod]
+        public void AddQueryParameters_Replaces_Existing()
+        {
+            var builder = new RequestBuilder("resource");
+            builder.AddQueryParameter("page", 1);
+            var request = builder.AddQueryParameters(new Dictionary<string, object>
+            {
+                { "page", 2 },
+                { "limit", 50 }
+            }).Create();
+            var matchingParams = request.Parameters.Where(p => p.Name == "page").ToList();
+            Assert.AreEqual(1, matchingParams.Count);
+            Assert.AreEqual("2", matchingParams[0].Value);
+            Assert.AreEqual(2, request.Parameters.Count);
+        }
+
+        [TestMethod]
+        public void AddQueryParameters_Case_Insensitive_Replacement()
+        {
+            var builder = new RequestBuilder("resource");
+            builder.AddQueryParameter("Page", 1);
+            var request = builder.AddQueryParameters(new Dictionary<string, object>
+            {
+                { "page", 2 }
+            }).Create();
+            var matchingParams = request.Parameters.Where(p =>
+                string.Equals(p.Name, "page", StringComparison.InvariantCultureIgnoreCase)).ToList();
+            Assert.AreEqual(1, matchingParams.Count);
+            Assert.AreEqual("2", matchingParams[0].Value);
+        }
+
+        [TestMethod]
+        public void AddQueryParameters_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("resource");
+            var result = builder.AddQueryParameters(new Dictionary<string, object> { { "test", "value" } });
+            Assert.AreSame(builder, result);
+        }
+
+        // --- AddUrlSegment ---
+        [TestMethod]
+        public void AddUrlSegment_Null_Name_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.AddUrlSegment(null, "value"));
+        }
+
+        [TestMethod]
+        public void AddUrlSegment_Empty_Name_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.AddUrlSegment("", "value"));
+        }
+
+        [TestMethod]
+        public void AddUrlSegment_Null_Value_Throws()
+        {
+            var builder = new RequestBuilder("resource");
+            Assert.ThrowsException<ArgumentNullException>(() => builder.AddUrlSegment("id", null));
+        }
+
+        [TestMethod]
+        public void AddUrlSegment_Adds_Url_Segment()
+        {
+            var builder = new RequestBuilder("users/{id}");
+            var request = builder.AddUrlSegment("id", "123").Create();
+            var param = request.Parameters.FirstOrDefault(p => p.Name == "id");
+            Assert.IsNotNull(param);
+            Assert.AreEqual("123", param.Value);
+            Assert.AreEqual(ParameterType.UrlSegment, param.Type);
+        }
+
+        [TestMethod]
+        public void AddUrlSegment_Replaces_Existing()
+        {
+            var builder = new RequestBuilder("users/{id}");
+            var request = builder
+                .AddUrlSegment("id", "123")
+                .AddUrlSegment("id", "456")
+                .Create();
+            var matchingParams = request.Parameters.Where(p => p.Name == "id").ToList();
+            Assert.AreEqual(1, matchingParams.Count);
+            Assert.AreEqual("456", matchingParams[0].Value);
+        }
+
+        [TestMethod]
+        public void AddUrlSegment_Case_Insensitive_Replacement()
+        {
+            var builder = new RequestBuilder("users/{id}");
+            var request = builder
+                .AddUrlSegment("Id", "123")
+                .AddUrlSegment("id", "456")
+                .Create();
+            var matchingParams = request.Parameters.Where(p =>
+                string.Equals(p.Name, "id", StringComparison.InvariantCultureIgnoreCase)).ToList();
+            Assert.AreEqual(1, matchingParams.Count);
+            Assert.AreEqual("456", matchingParams[0].Value);
+        }
+
+        [TestMethod]
+        public void AddUrlSegment_Returns_Builder_For_Chaining()
+        {
+            var builder = new RequestBuilder("users/{id}");
+            var result = builder.AddUrlSegment("id", "123");
+            Assert.AreSame(builder, result);
+        }
+
+        // --- Fluent Chaining Integration ---
+        [TestMethod]
+        public void FluentChaining_Mixed_Methods()
+        {
+            var request = new RestRequest().WithBuilder("users/{id}/posts")
+                .AddUrlSegment("id", "123")
+                .AddQueryParameter("page", 1)
+                .AddQueryParameter("limit", 50)
+                .SetMethod(Method.Get)
+                .Create();
+            
+            Assert.AreEqual(Method.Get, request.Method);
+            Assert.AreEqual(3, request.Parameters.Count);
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "id" && p.Type == ParameterType.UrlSegment));
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "page" && p.Type == ParameterType.QueryString));
+            Assert.IsNotNull(request.Parameters.FirstOrDefault(p => p.Name == "limit" && p.Type == ParameterType.QueryString));
+        }
+
+        [TestMethod]
+        public void FluentChaining_With_Bulk_Query_Parameters()
+        {
+            var request = new RestRequest().WithBuilder("users/{id}/posts")
+                .AddUrlSegment("id", "123")
+                .AddQueryParameters(new Dictionary<string, object>
+                {
+                    { "page", 1 },
+                    { "sort", "desc" }
+                })
+                .Create();
+            
+            Assert.AreEqual(3, request.Parameters.Count);
+            Assert.AreEqual("123", request.Parameters.FirstOrDefault(p => p.Name == "id")?.Value);
+            Assert.AreEqual("1", request.Parameters.FirstOrDefault(p => p.Name == "page")?.Value);
+            Assert.AreEqual("desc", request.Parameters.FirstOrDefault(p => p.Name == "sort")?.Value);
         }
     }
 }

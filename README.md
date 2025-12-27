@@ -35,12 +35,51 @@ var request = builder
 
 
 ```csharp
-var request = RestRequest.WithBuilder("user")
+var request = new RestRequest().WithBuilder("user")
 	.SetFormat(DataFormat.Json)
 	.SetMethod(Method.GET)
 	.AddHeader("test-header", "value")
 	.Create();
 ```
+
+### Query Parameters and URL Segments
+
+The library provides convenient fluent methods to add query string parameters and URL segments without manually creating Parameter objects:
+
+```csharp
+// Add query parameters individually
+var request = new RestRequest().WithBuilder("users")
+    .AddQueryParameter("page", 1)
+    .AddQueryParameter("limit", 50)
+    .AddQueryParameter("sort", "desc")
+    .Create();
+```
+
+```csharp
+// Add multiple query parameters at once
+var request = new RestRequest().WithBuilder("users")
+    .AddQueryParameters(new Dictionary<string, object>
+    {
+        { "page", 1 },
+        { "limit", 50 },
+        { "sort", "desc" }
+    })
+    .Create();
+```
+
+```csharp
+// Add URL segments for parameterized routes
+var request = new RestRequest().WithBuilder("users/{id}/posts")
+    .AddUrlSegment("id", 123)
+    .AddQueryParameter("page", 1)
+    .Create();
+```
+
+**Features:**
+- All values are automatically converted to strings using `InvariantCulture`
+- Duplicate parameters are replaced (case-insensitive)
+- All methods support fluent chaining
+- Null values in bulk operations are skipped
 
 ## License
 
