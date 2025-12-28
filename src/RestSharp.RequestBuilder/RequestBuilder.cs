@@ -231,18 +231,7 @@ namespace RestSharp.RequestBuilder
         /// <inheritdoc/>
         public IRequestBuilder AddFile(string name, string path, string contentType = null)
         {
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-
-            if (string.IsNullOrEmpty(path))
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-
             _files.Add(new PathFileAttachment(name, path, contentType));
-
             return this;
         }
 
@@ -265,50 +254,14 @@ namespace RestSharp.RequestBuilder
         /// <inheritdoc/>
         public IRequestBuilder AddFileBytes(string name, byte[] bytes, string fileName, string contentType = null)
         {
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-
-            if (bytes == null)
-            {
-                throw new ArgumentNullException(nameof(bytes));
-            }
-
-            if (bytes.Length == 0)
-            {
-                throw new ArgumentException("Byte array cannot be empty.", nameof(bytes));
-            }
-            if (string.IsNullOrEmpty(fileName))
-            {
-                throw new ArgumentNullException(nameof(fileName));
-            }
-
             _files.Add(new ByteFileAttachment(name, bytes, fileName, contentType));
-
             return this;
         }
 
         /// <inheritdoc/>
         public IRequestBuilder AddFileStream(string name, Stream stream, string fileName, string contentType = null)
         {
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-
-            if (stream == null)
-            {
-                throw new ArgumentNullException(nameof(stream));
-            }
-
-            if (string.IsNullOrEmpty(fileName))
-            {
-                throw new ArgumentNullException(nameof(fileName));
-            }
-
             _files.Add(new StreamFileAttachment(name, stream, fileName, contentType));
-
             return this;
         }
 

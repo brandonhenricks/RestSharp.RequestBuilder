@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace RestSharp.RequestBuilder.Models
 {
@@ -24,6 +25,11 @@ namespace RestSharp.RequestBuilder.Models
         /// <param name="contentType">The content type of the file attachment.</param>
         protected FileAttachment(string name, string contentType)
         {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
             Name = name;
             ContentType = contentType;
         }
@@ -48,6 +54,11 @@ namespace RestSharp.RequestBuilder.Models
         public PathFileAttachment(string name, string path, string contentType = null)
             : base(name, contentType)
         {
+            if (string.IsNullOrEmpty(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
             Path = path;
         }
     }
@@ -77,6 +88,21 @@ namespace RestSharp.RequestBuilder.Models
         public ByteFileAttachment(string name, byte[] bytes, string fileName, string contentType = null)
             : base(name, contentType)
         {
+            if (bytes == null)
+            {
+                throw new ArgumentNullException(nameof(bytes));
+            }
+
+            if (bytes.Length == 0)
+            {
+                throw new ArgumentException("Byte array cannot be empty.", nameof(bytes));
+            }
+
+            if (string.IsNullOrEmpty(fileName))
+            {
+                throw new ArgumentNullException(nameof(fileName));
+            }
+
             Bytes = bytes;
             FileName = fileName;
         }
@@ -107,6 +133,16 @@ namespace RestSharp.RequestBuilder.Models
         public StreamFileAttachment(string name, Stream stream, string fileName, string contentType = null)
             : base(name, contentType)
         {
+            if (stream == null)
+            {
+                throw new ArgumentNullException(nameof(stream));
+            }
+
+            if (string.IsNullOrEmpty(fileName))
+            {
+                throw new ArgumentNullException(nameof(fileName));
+            }
+
             Stream = stream;
             FileName = fileName;
         }
