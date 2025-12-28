@@ -723,6 +723,9 @@ namespace RestSharp.RequestBuilder
                     case StreamFileAttachment streamFile:
                         request.AddFile(streamFile.Name, () => streamFile.Stream, streamFile.FileName, streamFile.ContentType);
                         break;
+                    default:
+                        throw new InvalidOperationException(
+                            $"Unsupported FileAttachment type: {file?.GetType().FullName}");
                 }
             }
 
