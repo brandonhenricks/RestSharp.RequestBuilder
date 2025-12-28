@@ -127,6 +127,104 @@ var request = new RestRequest().WithBuilder("api/protected")
 - All methods validate input and throw `ArgumentNullException` for null or empty values
 - Full XML documentation for IntelliSense support
 
+### Header Convenience Methods
+
+The library provides fluent convenience methods for common HTTP headers, making it easier to set standard headers without having to remember exact header names or worry about typos:
+
+#### Accept Header
+```csharp
+// Specify custom Accept header
+var request = new RestRequest().WithBuilder("api/data")
+    .WithAccept("application/json")
+    .Create();
+
+// Convenient shortcuts for common media types
+var jsonRequest = new RestRequest().WithBuilder("api/data")
+    .WithAcceptJson()  // Sets Accept: application/json
+    .Create();
+
+var xmlRequest = new RestRequest().WithBuilder("api/data")
+    .WithAcceptXml()  // Sets Accept: application/xml
+    .Create();
+```
+
+#### Content-Type Header
+```csharp
+var request = new RestRequest().WithBuilder("api/upload")
+    .SetMethod(Method.Post)
+    .WithContentType("application/json")
+    .AddJsonBody(new { data = "value" })
+    .Create();
+```
+
+#### User-Agent Header
+```csharp
+var request = new RestRequest().WithBuilder("api/resource")
+    .WithUserAgent("MyCustomClient/1.2.3")
+    .Create();
+```
+
+#### Custom Authorization Header
+```csharp
+// For custom authorization schemes beyond Bearer/Basic
+var request = new RestRequest().WithBuilder("api/protected")
+    .WithAuthorization("Digest", "realm=\"example.com\"")
+    .Create();
+
+// You can still use the specific helpers for common schemes
+var bearerRequest = new RestRequest().WithBuilder("api/me")
+    .WithBearerToken("token123")  // Shortcut for WithAuthorization("Bearer", "token123")
+    .Create();
+```
+
+#### Conditional Request Headers (ETags)
+```csharp
+// If-Match for optimistic concurrency control
+var updateRequest = new RestRequest().WithBuilder("api/resource/{id}")
+    .AddUrlSegment("id", "123")
+    .SetMethod(Method.Put)
+    .WithIfMatch("\"v1-abc123\"")
+    .AddJsonBody(new { name = "Updated Name", version = "v2" })
+    .Create();
+
+// If-None-Match for efficient caching
+var cacheRequest = new RestRequest().WithBuilder("api/resource/{id}")
+    .AddUrlSegment("id", "123")
+    .WithIfNoneMatch("\"v1-abc123\"")
+    .Create();
+```
+
+#### Referer and Origin Headers
+```csharp
+// Useful for CORS and tracking
+var request = new RestRequest().WithBuilder("api/external")
+    .WithReferer("https://myapp.com/page")
+    .WithOrigin("https://myapp.com")
+    .Create();
+```
+
+#### Combining Multiple Headers
+```csharp
+// All header methods chain fluently
+var request = new RestRequest().WithBuilder("api/items")
+    .WithAcceptJson()
+    .WithContentType("application/json")
+    .WithUserAgent("MyClient/1.0.0")
+    .WithBearerToken("mytoken")
+    .WithIfNoneMatch("\"abc1234\"")
+    .WithReferer("https://example.com/page")
+    .WithOrigin("https://example.com")
+    .AddQueryParameter("page", 1)
+    .Create();
+```
+
+**Header Method Features:**
+- All header methods use standard HTTP header casing (e.g., 'Accept', 'Content-Type', 'User-Agent')
+- Duplicate headers are automatically replaced when called multiple times
+- All methods validate input and throw `ArgumentNullException` for null or empty values
+- Seamless integration with other builder methods for flexible request construction
+- Full XML documentation for IntelliSense support
+
 ### Request Bodies
 
 The library provides convenient shortcut methods for adding request bodies with common content types:

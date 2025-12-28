@@ -260,6 +260,75 @@ namespace RestSharp.RequestBuilder.Interfaces
         IRequestBuilder WithOAuth2(string accessToken);
 
         /// <summary>
+        /// Adds the Accept header to the request.
+        /// </summary>
+        /// <param name="mediaType">The media type value for the Accept header (e.g., "application/json").</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder WithAccept(string mediaType);
+
+        /// <summary>
+        /// Adds the Accept header with "application/json" media type.
+        /// </summary>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder WithAcceptJson();
+
+        /// <summary>
+        /// Adds the Accept header with "application/xml" media type.
+        /// </summary>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder WithAcceptXml();
+
+        /// <summary>
+        /// Adds the Content-Type header to the request.
+        /// </summary>
+        /// <param name="contentType">The content type value (e.g., "application/json").</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder WithContentType(string contentType);
+
+        /// <summary>
+        /// Adds the User-Agent header to the request.
+        /// </summary>
+        /// <param name="userAgent">The user agent string (e.g., "MyCustomClient/1.2.3").</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder WithUserAgent(string userAgent);
+
+        /// <summary>
+        /// Adds the Authorization header with a custom scheme and value.
+        /// </summary>
+        /// <param name="scheme">The authentication scheme (e.g., "Bearer", "Basic").</param>
+        /// <param name="value">The authentication value.</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder WithAuthorization(string scheme, string value);
+
+        /// <summary>
+        /// Adds the If-Match header for conditional requests.
+        /// </summary>
+        /// <param name="etag">The ETag value (e.g., "\"abc1234\"").</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder WithIfMatch(string etag);
+
+        /// <summary>
+        /// Adds the If-None-Match header for conditional requests.
+        /// </summary>
+        /// <param name="etag">The ETag value (e.g., "\"abc1234\"").</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder WithIfNoneMatch(string etag);
+
+        /// <summary>
+        /// Adds the Referer header to the request.
+        /// </summary>
+        /// <param name="referer">The referer URL.</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder WithReferer(string referer);
+
+        /// <summary>
+        /// Adds the Origin header to the request.
+        /// </summary>
+        /// <param name="origin">The origin URL (e.g., "https://example.com").</param>
+        /// <returns>The current instance of <see cref="IRequestBuilder"/>.</returns>
+        IRequestBuilder WithOrigin(string origin);
+
+        /// <summary>
         /// Creates the <see cref="RestRequest"/> based on the configured parameters.
         /// </summary>
         /// <returns>A new instance of <see cref="RestRequest"/>.</returns>

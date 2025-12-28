@@ -655,6 +655,111 @@ namespace RestSharp.RequestBuilder
         }
 
         /// <inheritdoc/>
+        public IRequestBuilder WithAccept(string mediaType)
+        {
+            if (string.IsNullOrEmpty(mediaType))
+            {
+                throw new ArgumentNullException(nameof(mediaType));
+            }
+
+            return AddHeader("Accept", mediaType);
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder WithAcceptJson()
+        {
+            return WithAccept("application/json");
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder WithAcceptXml()
+        {
+            return WithAccept("application/xml");
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder WithContentType(string contentType)
+        {
+            if (string.IsNullOrEmpty(contentType))
+            {
+                throw new ArgumentNullException(nameof(contentType));
+            }
+
+            return AddHeader("Content-Type", contentType);
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder WithUserAgent(string userAgent)
+        {
+            if (string.IsNullOrEmpty(userAgent))
+            {
+                throw new ArgumentNullException(nameof(userAgent));
+            }
+
+            return AddHeader("User-Agent", userAgent);
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder WithAuthorization(string scheme, string value)
+        {
+            if (string.IsNullOrEmpty(scheme))
+            {
+                throw new ArgumentNullException(nameof(scheme));
+            }
+
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
+            return AddHeader("Authorization", $"{scheme} {value}");
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder WithIfMatch(string etag)
+        {
+            if (string.IsNullOrEmpty(etag))
+            {
+                throw new ArgumentNullException(nameof(etag));
+            }
+
+            return AddHeader("If-Match", etag);
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder WithIfNoneMatch(string etag)
+        {
+            if (string.IsNullOrEmpty(etag))
+            {
+                throw new ArgumentNullException(nameof(etag));
+            }
+
+            return AddHeader("If-None-Match", etag);
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder WithReferer(string referer)
+        {
+            if (string.IsNullOrEmpty(referer))
+            {
+                throw new ArgumentNullException(nameof(referer));
+            }
+
+            return AddHeader("Referer", referer);
+        }
+
+        /// <inheritdoc/>
+        public IRequestBuilder WithOrigin(string origin)
+        {
+            if (string.IsNullOrEmpty(origin))
+            {
+                throw new ArgumentNullException(nameof(origin));
+            }
+
+            return AddHeader("Origin", origin);
+        }
+
+        /// <inheritdoc/>
         public RestRequest Create()
         {
             var request = new RestRequest(_resource, _method);
