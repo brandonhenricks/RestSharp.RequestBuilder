@@ -184,7 +184,7 @@ var updateRequest = new RestRequest().WithBuilder("api/resource/{id}")
     .AddUrlSegment("id", "123")
     .SetMethod(Method.Put)
     .WithIfMatch("\"v1-abc123\"")
-    .AddJsonBody(updatedData)
+    .AddJsonBody(new { name = "Updated Name", version = "v2" })
     .Create();
 
 // If-None-Match for efficient caching
