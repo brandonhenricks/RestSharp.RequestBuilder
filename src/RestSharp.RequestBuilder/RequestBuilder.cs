@@ -15,19 +15,6 @@ namespace RestSharp.RequestBuilder
     {
         #region Private Properties
 
-        /// <summary>
-        /// Represents a file attachment with various source types.
-        /// </summary>
-        private sealed class FileAttachment
-        {
-            public string Name { get; set; }
-            public string Path { get; set; }
-            public string ContentType { get; set; }
-            public byte[] Bytes { get; set; }
-            public Stream Stream { get; set; }
-            public string FileName { get; set; }
-        }
-
         private readonly string _resource;
         private readonly Dictionary<string, string> _headers;
         private readonly HashSet<CookieValue> _cookieValues;
@@ -244,23 +231,7 @@ namespace RestSharp.RequestBuilder
         /// <inheritdoc/>
         public IRequestBuilder AddFile(string name, string path, string contentType = null)
         {
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-
-            if (string.IsNullOrEmpty(path))
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-
-            _files.Add(new FileAttachment
-            {
-                Name = name,
-                Path = path,
-                ContentType = contentType
-            });
-
+            _files.Add(new PathFileAttachment(name, path, contentType));
             return this;
         }
 
@@ -283,62 +254,14 @@ namespace RestSharp.RequestBuilder
         /// <inheritdoc/>
         public IRequestBuilder AddFileBytes(string name, byte[] bytes, string fileName, string contentType = null)
         {
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-
-            if (bytes == null)
-            {
-                throw new ArgumentNullException(nameof(bytes));
-            }
-
-            if (bytes.Length == 0)
-            {
-                throw new ArgumentException("Byte array cannot be empty.", nameof(bytes));
-            }
-            if (string.IsNullOrEmpty(fileName))
-            {
-                throw new ArgumentNullException(nameof(fileName));
-            }
-
-            _files.Add(new FileAttachment
-            {
-                Name = name,
-                Bytes = bytes,
-                FileName = fileName,
-                ContentType = contentType
-            });
-
+            _files.Add(new ByteFileAttachment(name, bytes, fileName, contentType));
             return this;
         }
 
         /// <inheritdoc/>
         public IRequestBuilder AddFileStream(string name, Stream stream, string fileName, string contentType = null)
         {
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-
-            if (stream == null)
-            {
-                throw new ArgumentNullException(nameof(stream));
-            }
-
-            if (string.IsNullOrEmpty(fileName))
-            {
-                throw new ArgumentNullException(nameof(fileName));
-            }
-
-            _files.Add(new FileAttachment
-            {
-                Name = name,
-                Stream = stream,
-                FileName = fileName,
-                ContentType = contentType
-            });
-
+            _files.Add(new StreamFileAttachment(name, stream, fileName, contentType));
             return this;
         }
 
@@ -786,20 +709,23 @@ namespace RestSharp.RequestBuilder
                 request.AddCookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain);
             }
 
-            // Add all files to the request
+            // Add all files to the request using pattern matching
             foreach (var file in _files)
             {
-                if (!string.IsNullOrEmpty(file.Path))
+                switch (file)
                 {
-                    request.AddFile(file.Name, file.Path, file.ContentType);
-                }
-                else if (file.Bytes != null && file.Bytes.Length > 0)
-                {
-                    request.AddFile(file.Name, file.Bytes, file.FileName, file.ContentType);
-                }
-                else if (file.Stream != null)
-                {
-                    request.AddFile(file.Name, () => file.Stream, file.FileName, file.ContentType);
+                    case PathFileAttachment pathFile:
+                        request.AddFile(pathFile.Name, pathFile.Path, pathFile.ContentType);
+                        break;
+                    case ByteFileAttachment byteFile:
+                        request.AddFile(byteFile.Name, byteFile.Bytes, byteFile.FileName, byteFile.ContentType);
+                        break;
+                    case StreamFileAttachment streamFile:
+                        request.AddFile(streamFile.Name, () => streamFile.Stream, streamFile.FileName, streamFile.ContentType);
+                        break;
+                    default:
+                        throw new InvalidOperationException(
+                            $"Unsupported FileAttachment type: {file?.GetType().FullName}");
                 }
             }
 
